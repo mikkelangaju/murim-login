@@ -69,10 +69,9 @@ blockquote {
   padding: 0.1rem 1rem;
 }
 
-/* Kindle Oasis is the reference. A solid panel is slow to refresh on e-ink
-   and the device paints transparent PNG pixels white, so the frame is only
-   gold rules on the page. Text stays the body ink. Dragon and corner PNGs
-   are matted to white, which is what the Oasis shows through an empty panel. */
+/* Transparent panels and PNG ornaments let the reader's chosen page color
+   show through. Text inherits the reader's ink; gold artwork keeps its color.
+   Regenerate PNGs from the SVG masters with tools/render_ornaments.py. */
 table.system-window {
   width: 100%;
   margin: 1.5em 0 1.25em;

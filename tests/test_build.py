@@ -8,6 +8,17 @@ from tools.build import BOOK_TYP, COLOPHON_TYP, COVER, READER, RIGHTS, TYPST_TEM
 
 
 class BuildToolTest(unittest.TestCase):
+    def test_epub_ornaments_have_real_transparency(self):
+        from PIL import Image
+
+        ornaments = READER / "src" / "ornaments"
+        names = ("dragon.png", "dragon-flip.png", "corner-tl.png", "corner-tr.png", "corner-bl.png", "corner-br.png")
+        for name in names:
+            with self.subTest(name=name), Image.open(ornaments / name) as image:
+                self.assertEqual(image.mode, "RGBA")
+                self.assertEqual(image.getchannel("A").getextrema(), (0, 255))
+                self.assertGreaterEqual(image.width, 120)
+
     def test_epub_splits_chapters_and_keeps_reused_note_labels_local(self):
         with tempfile.TemporaryDirectory() as temp:
             paths = [Path(temp) / f"{number:04d}.md" for number in (0, 1)]
