@@ -53,13 +53,14 @@ img.scene-separator-art {
   text-align: center;
 }
 
-/* Each fixed-height ornament strip stays inside the table's only cell. */
+/* The header grows with the title; its rail stays aligned with the corners. */
 .system-header {
   display: block;
   position: relative;
-  height: 36px;
+  box-sizing: border-box;
+  min-height: 36px;
   margin: 0;
-  padding: 0;
+  padding: 0 0 9.5px;
   border: 0;
   background-color: transparent !important;
   background-image:
@@ -82,8 +83,9 @@ img.scene-separator-art {
   align-items: center;
   justify-content: center;
   position: relative;
-  width: 132px;
-  height: 26.5px;
+  width: max-content;
+  min-width: 132px;
+  min-height: 26.5px;
   margin: 0 auto;
   padding: 0;
   border: 0;
@@ -107,12 +109,12 @@ img.scene-separator-art {
 
 .system-plaque {
   display: block;
-  flex: 0 0 62px;
+  flex: 0 0 auto;
   box-sizing: border-box;
-  width: 62px;
-  height: 20px;
+  min-width: 62px;
+  min-height: 20px;
   margin: 0 7px;
-  padding: 0;
+  padding: 0 0.35em;
   background-color: #2a5f8c !important;
   background-color: light-dark(#2a5f8c, #173957) !important;
   background-image: linear-gradient(#2a5f8c, #2a5f8c) !important;
@@ -124,9 +126,12 @@ img.scene-separator-art {
   font-size: 10px;
   font-weight: bold;
   letter-spacing: 0.16em;
-  line-height: 18px;
+  line-height: 1.8;
   text-align: center;
   text-transform: uppercase;
+  white-space: nowrap;
+  -webkit-hyphens: none;
+  hyphens: none;
 }
 
 .system-corner-art {
@@ -142,8 +147,8 @@ img.scene-separator-art {
 }
 
 /* Gold extends 2px past the corner artwork, including at page edges. */
-.system-corner-tl { top: 12px; left: 2px; }
-.system-corner-tr { top: 12px; right: 2px; }
+.system-corner-tl { bottom: 0; left: 2px; }
+.system-corner-tr { bottom: 0; right: 2px; }
 .system-corner-bl { bottom: 2px; left: 2px; }
 .system-corner-br { bottom: 2px; right: 2px; }
 
