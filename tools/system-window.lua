@@ -64,15 +64,15 @@ function BlockQuote(block)
     return result
   end
 
-  -- Corner pieces plus a top crest. Kindle Oasis drops border-image and
-  -- absolute positioning, so the frame is a table and the dragons and SYSTEM
-  -- plate sit in the top edge instead of as a heading inside the panel.
+  -- One fixed-layout table keeps decorative images out of nested auto-width
+  -- cells, which collapse under reader-wide img { max-width: 100% } rules.
   local function picture(name, width, height)
     return pandoc.Image(
       {},
       ornament(name),
       "",
-      pandoc.Attr("", {}, {width = tostring(width), height = tostring(height)})
+      pandoc.Attr("", {name:match("^dragon") and "system-dragon" or "system-corner-art"},
+        {width = tostring(width), height = tostring(height)})
     )
   end
 
@@ -91,8 +91,8 @@ function BlockQuote(block)
     return cell(pandoc.Plain(inlines), classes, colspan)
   end
 
-  local function blank(classes)
-    return plain({pandoc.RawInline("html", "&#160;")}, classes)
+  local function blank(classes, colspan)
+    return plain({pandoc.RawInline("html", "&#160;")}, classes, colspan)
   end
 
   local cols = function(count)
@@ -114,41 +114,36 @@ function BlockQuote(block)
     )
   end
 
-  -- Rails are the gold rules beside the title. The plate and dragons share
-  -- one row so the label centers on the dragons instead of sitting on the baseline.
-  local crest = grid({"system-head", "system-crest"}, 5, {
-    pandoc.Row({
-      plain({pandoc.RawInline("html", "<span class=\"system-bar\"></span>")}, {"system-rail"}),
-      plain({picture("dragon.png", 40, 32)}, {"system-ornament"}),
-      plain(
-        {pandoc.Span(block.content[1].content, pandoc.Attr("", {"system-plaque"}))},
-        {"system-badge"}
-      ),
-      plain({picture("dragon-flip.png", 40, 32)}, {"system-ornament"}),
-      plain({pandoc.RawInline("html", "<span class=\"system-bar\"></span>")}, {"system-rail"}),
-    }),
-  })
+  local crest = {
+    picture("dragon.png", 24, 19),
+    pandoc.Space(),
+    pandoc.Span(block.content[1].content, pandoc.Attr("", {"system-plaque"})),
+    pandoc.Space(),
+    picture("dragon-flip.png", 24, 19),
+  }
 
   local body = {}
   for index = 2, #block.content do
     body[#body + 1] = block.content[index]
   end
 
-  return grid({"system-window"}, 3, {
+  return grid({"system-window"}, 5, {
     pandoc.Row({
-      plain({picture("corner-tl.png", 48, 48)}, {"system-corner"}),
-      cell(crest, {"system-top"}),
-      plain({picture("corner-tr.png", 48, 48)}, {"system-corner"}),
+      plain({picture("corner-tl.png", 24, 24)}, {"system-corner", "system-corner-top"}),
+      plain({pandoc.Span({}, pandoc.Attr("", {"system-bar"}))}, {"system-rail"}),
+      plain(crest, {"system-crest"}),
+      plain({pandoc.Span({}, pandoc.Attr("", {"system-bar"}))}, {"system-rail"}),
+      plain({picture("corner-tr.png", 24, 24)}, {"system-corner", "system-corner-top"}),
     }),
     pandoc.Row({
       blank({"system-edge", "system-edge-left"}),
-      cell(body, {"system-body"}),
+      cell(body, {"system-body"}, 3),
       blank({"system-edge", "system-edge-right"}),
     }),
     pandoc.Row({
-      plain({picture("corner-bl.png", 48, 48)}, {"system-corner", "system-corner-bottom"}),
-      blank({"system-base"}),
-      plain({picture("corner-br.png", 48, 48)}, {"system-corner", "system-corner-bottom"}),
+      plain({picture("corner-bl.png", 24, 24)}, {"system-corner", "system-corner-bottom"}),
+      blank({"system-base"}, 3),
+      plain({picture("corner-br.png", 24, 24)}, {"system-corner", "system-corner-bottom"}),
     }),
   })
 end

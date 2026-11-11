@@ -317,6 +317,13 @@ EPUB system-window PNGs are transparent renders of the SVG masters in
 (requires `rsvg-convert`, provided by `librsvg2-bin` on Ubuntu). Keep the alpha
 channel so reader themes show through the ornaments.
 
+For system-window CSS changes, also run
+`MURIM_WEBKIT_QA=1 python -m unittest discover -s tests -p test_epub_layout.py`.
+This opt-in check requires the Playwright Python package and its WebKit browser
+(`python -m playwright install --with-deps webkit`). It checks narrow screens,
+large text, light/dark panels, and the responsive-image rule that collapsed
+the old header's dragons in Apple Books.
+
 ## Address Pass
 
 A retrospective pass over finalized chapters that fixes only how `소협` is

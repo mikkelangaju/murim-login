@@ -13,6 +13,9 @@ SVG = "{http://www.w3.org/2000/svg}"
 
 def render(source: str, target: str, width: int, height: int, transform: str = "") -> None:
     root = ET.parse(ORNAMENTS / source).getroot()
+    if source == "corner.svg":
+        # Trim the SVG's outer padding so its gold arms meet CSS frame rules.
+        root.set("viewBox", "2.625 2.625 52.55 52.55")
     if transform:
         children = list(root)
         for child in children:
