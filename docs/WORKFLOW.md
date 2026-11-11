@@ -312,7 +312,7 @@ Run `python tools/build.py`; select chapters and formats as documented by
 `python tools/build.py --help`. Styling lives in `tools/system-window.lua` and
 `tools/book.css`.
 
-EPUB system-window PNGs are transparent renders of the SVG masters in
+EPUB system-window and yin-yang scene-separator PNGs are transparent renders of the SVG masters in
 `reader/src/ornaments/`. Regenerate them with `python tools/render_ornaments.py`
 (requires `rsvg-convert`, provided by `librsvg2-bin` on Ubuntu). Keep the alpha
 channel so reader themes show through the ornaments.

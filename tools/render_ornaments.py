@@ -33,6 +33,7 @@ def main() -> None:
     if shutil.which("rsvg-convert") is None:
         raise SystemExit("Install librsvg2-bin to provide rsvg-convert")
     # Three pixels per displayed pixel keeps small details crisp on Retina screens.
+    render("yin-yang.svg", "yin-yang.png", 144, 144)
     render("dragon.svg", "dragon.png", 120, 96)
     render("dragon.svg", "dragon-flip.png", 120, 96, "translate(640 0) scale(-1 1)")
     for suffix, transform in (

@@ -69,6 +69,25 @@ blockquote {
   padding: 0.1rem 1rem;
 }
 
+.scene-separator {
+  margin: 1.6em 0;
+  text-align: center;
+  line-height: 1;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+img.scene-separator-art {
+  display: block;
+  width: 1.35em;
+  min-width: 1.35em;
+  max-width: 1.35em;
+  height: 1.35em;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+}
+
 /* A single fixed-layout frame avoids nested table/image sizing bugs in Books.
    Corner SVGs are cropped to their painted bounds by render_ornaments.py. */
 table.system-window {

@@ -12,12 +12,33 @@ class BuildToolTest(unittest.TestCase):
         from PIL import Image
 
         ornaments = READER / "src" / "ornaments"
-        names = ("dragon.png", "dragon-flip.png", "corner-tl.png", "corner-tr.png", "corner-bl.png", "corner-br.png")
+        names = ("dragon.png", "dragon-flip.png", "corner-tl.png", "corner-tr.png", "corner-bl.png", "corner-br.png", "yin-yang.png")
         for name in names:
             with self.subTest(name=name), Image.open(ornaments / name) as image:
                 self.assertEqual(image.mode, "RGBA")
                 self.assertEqual(image.getchannel("A").getextrema(), (0, 255))
                 self.assertGreaterEqual(image.width, 120)
+
+    def test_epub_scene_break_embeds_yin_yang(self):
+        import posixpath
+
+        with tempfile.TemporaryDirectory() as temp:
+            source = Path(temp) / "chapter.md"
+            source.write_text("# Chapter 0\n\nBefore.\n\n---\n\nAfter.\n", encoding="utf-8")
+            target = Path(temp) / "book.epub"
+            run_pandoc([source], target, "epub3")
+            validate_epub(target)
+            ns = "{http://www.w3.org/1999/xhtml}"
+            with ZipFile(target) as archive:
+                name = "EPUB/text/ch001.xhtml"
+                root = ET.fromstring(archive.read(name))
+                separators = root.findall(f".//{ns}div[@role='separator']")
+                self.assertEqual(len(separators), 1)
+                self.assertEqual(len(root.findall(f".//{ns}hr")), 0)
+                image = separators[0].find(f".//{ns}img")
+                self.assertEqual(image.get("class"), "scene-separator-art")
+                embedded = posixpath.normpath(posixpath.join(posixpath.dirname(name), image.get("src")))
+                self.assertEqual(archive.read(embedded), (READER / "src/ornaments/yin-yang.png").read_bytes())
 
     def test_epub_splits_chapters_and_keeps_reused_note_labels_local(self):
         with tempfile.TemporaryDirectory() as temp:

@@ -28,7 +28,7 @@ class EpubLayoutTest(unittest.TestCase):
                 "> Gather basic information and understand the situation.\n>\n"
                 "> - Grade: Tutorial (Chain Quest)\n"
                 "> - Restriction: First-time players\n"
-                "> - Rewards: Sturdy Martial Uniform Set\n",
+                "> - Rewards: Sturdy Martial Uniform Set\n\n---\n\nNext scene.\n",
                 encoding="utf-8",
             )
             (root / "book.css").write_bytes(STYLESHEET.read_bytes())
@@ -83,6 +83,15 @@ class EpubLayoutTest(unittest.TestCase):
                             };
                         })""")
                         self.assertEqual(len(results), 2)
+                        separator = page.locator("img.scene-separator-art").evaluate("""e => {
+                            const r = e.getBoundingClientRect();
+                            return {width:r.width, height:r.height, center:(r.left+r.right)/2,
+                                    loaded:e.complete && e.naturalWidth > 0};
+                        }""")
+                        self.assertTrue(separator["loaded"])
+                        self.assertAlmostEqual(separator["center"], width / 2, delta=1)
+                        self.assertAlmostEqual(separator["width"], 1.35 * font_size, delta=0.1)
+                        self.assertAlmostEqual(separator["height"], separator["width"], delta=0.1)
                         for result in results:
                             self.assertGreaterEqual(result["left"], 0)
                             self.assertLessEqual(result["right"], width)

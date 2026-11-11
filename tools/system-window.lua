@@ -35,6 +35,12 @@ function Div(block)
 end
 
 function HorizontalRule()
+  if FORMAT:match("epub") then
+    return pandoc.Div({pandoc.Plain({pandoc.Image(
+      {}, ornament("yin-yang.png"), "",
+      pandoc.Attr("", {"scene-separator-art"}, {width = "22", height = "22"})
+    )})}, pandoc.Attr("", {"scene-separator"}, {role = "separator"}))
+  end
   if not FORMAT:match("typst") then
     return nil
   end
