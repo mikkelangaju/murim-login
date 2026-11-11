@@ -25,6 +25,15 @@ function RawInline(inline)
   end
 end
 
+-- File-scope wrappers otherwise hide chapter headings from EPUB splitting.
+-- Keep file-scope parsing so repeated footnote labels stay chapter-local.
+function Div(block)
+  if FORMAT:match("epub") and block.identifier:match("%.md$")
+      and #block.classes == 0 then
+    return block.content
+  end
+end
+
 function HorizontalRule()
   if not FORMAT:match("typst") then
     return nil

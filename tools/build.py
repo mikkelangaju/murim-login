@@ -9,12 +9,14 @@ from __future__ import annotations
 
 import argparse
 import os
+import posixpath
 import shutil
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from zipfile import ZipFile
+from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SOURCE = ROOT / "translations"
@@ -172,12 +174,32 @@ def build_epub(paths: list[Path], output: Path, css: Path) -> Path:
 
 def validate_epub(path: Path) -> None:
     with ZipFile(path) as archive:
+        documents = {}
         for name in archive.namelist():
             if name.endswith((".xhtml", ".xml", ".opf", ".ncx", ".svg")):
                 try:
-                    ET.fromstring(archive.read(name))
+                    documents[name] = ET.fromstring(archive.read(name))
                 except ET.ParseError as error:
                     raise ValueError(f"invalid EPUB XML in {name}: {error}") from error
+        identifiers = {
+            name: {element.attrib["id"] for element in root.iter() if "id" in element.attrib}
+            for name, root in documents.items()
+        }
+        for name, root in documents.items():
+            if not name.endswith(".xhtml"):
+                continue
+            for element in root.iter("{http://www.w3.org/1999/xhtml}a"):
+                href = element.get("href")
+                if href is None:
+                    continue
+                link = urlsplit(href)
+                if link.scheme or link.netloc:
+                    continue
+                target = posixpath.normpath(posixpath.join(posixpath.dirname(name), unquote(link.path))) if link.path else name
+                if target not in archive.namelist() or (
+                    link.fragment and unquote(link.fragment) not in identifiers.get(target, set())
+                ):
+                    raise ValueError(f"broken EPUB link in {name}: {href}")
 
 
 def copy_book_assets(output: Path) -> Path:

@@ -2,11 +2,38 @@ import tempfile
 import unittest
 from pathlib import Path
 from zipfile import ZipFile
+import xml.etree.ElementTree as ET
 
 from tools.build import BOOK_TYP, COLOPHON_TYP, COVER, READER, RIGHTS, TYPST_TEMPLATE, chapter_paths, pandoc_base, run_pandoc, validate_epub, write_pdf_cover
 
 
 class BuildToolTest(unittest.TestCase):
+    def test_epub_splits_chapters_and_keeps_reused_note_labels_local(self):
+        with tempfile.TemporaryDirectory() as temp:
+            paths = [Path(temp) / f"{number:04d}.md" for number in (0, 1)]
+            for number, path in enumerate(paths):
+                path.write_text(f"# Chapter {number}\n\nText[^1].\n\n[^1]: Note for chapter {number}.\n", encoding="utf-8")
+            target = Path(temp) / "book.epub"
+            run_pandoc(paths, target, "epub3")
+            validate_epub(target)
+            with ZipFile(target) as archive:
+                chapters = sorted(n for n in archive.namelist() if n.startswith("EPUB/text/ch") and n.endswith(".xhtml"))
+                self.assertEqual(len(chapters), 2)
+                for number, name in enumerate(chapters):
+                    root = ET.fromstring(archive.read(name))
+                    notes = root.findall(".//{http://www.w3.org/1999/xhtml}aside")
+                    self.assertEqual(len(notes), 1)
+                    self.assertIn(f"Note for chapter {number}.", "".join(notes[0].itertext()))
+
+    def test_epub_validation_rejects_missing_link_targets(self):
+        with tempfile.TemporaryDirectory() as temp:
+            target = Path(temp) / "broken.epub"
+            for href in ("#missing-note", "missing.xhtml#fn1"):
+                with ZipFile(target, "w") as archive:
+                    archive.writestr("EPUB/text/ch001.xhtml", f'<html xmlns="http://www.w3.org/1999/xhtml"><a href="{href}">1</a></html>')
+                with self.assertRaisesRegex(ValueError, "broken EPUB link"):
+                    validate_epub(target)
+
     def test_epub_raw_breaks_produce_valid_xhtml(self):
         with tempfile.TemporaryDirectory() as temp:
             source = Path(temp) / "chapter.md"
