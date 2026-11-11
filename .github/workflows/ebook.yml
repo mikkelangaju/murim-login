@@ -5,6 +5,14 @@ on:
     branches: [master]
     paths:
       - "translations/**"
+      - "tools/build.py"
+      - "tools/book.css"
+      - "tools/system-window.lua"
+      - "tools/*.typ"
+      - "tools/fonts/**"
+      - "reader/src/ornaments/**"
+      - "cover.jpg"
+      - ".github/workflows/ebook.yml"
   workflow_dispatch:
 
 permissions:
