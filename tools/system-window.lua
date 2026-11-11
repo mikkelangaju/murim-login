@@ -116,9 +116,7 @@ function BlockQuote(block)
 
   local crest = {
     picture("dragon.png", 24, 19),
-    pandoc.Space(),
     pandoc.Span(block.content[1].content, pandoc.Attr("", {"system-plaque"})),
-    pandoc.Space(),
     picture("dragon-flip.png", 24, 19),
   }
 
@@ -131,7 +129,7 @@ function BlockQuote(block)
     pandoc.Row({
       plain({picture("corner-tl.png", 24, 24)}, {"system-corner", "system-corner-top"}),
       plain({pandoc.Span({}, pandoc.Attr("", {"system-bar"}))}, {"system-rail"}),
-      plain(crest, {"system-crest"}),
+      plain({pandoc.Span(crest, pandoc.Attr("", {"system-crest-content"}))}, {"system-crest"}),
       plain({pandoc.Span({}, pandoc.Attr("", {"system-bar"}))}, {"system-rail"}),
       plain({picture("corner-tr.png", 24, 24)}, {"system-corner", "system-corner-top"}),
     }),

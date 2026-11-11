@@ -44,6 +44,7 @@ class EpubLayoutTest(unittest.TestCase):
                 for width, font_size, theme in (
                     (320, 16, "light"), (390, 24, "light"),
                     (700, 16, "light"), (390, 24, "dark"), (700, 16, "dark"),
+                    (390, 32, "light"), (700, 32, "dark"),
                 ):
                     with self.subTest(width=width, font_size=font_size, theme=theme):
                         page.set_viewport_size({"width": width, "height": 1100})
@@ -54,6 +55,8 @@ class EpubLayoutTest(unittest.TestCase):
                         page.add_style_tag(content=(
                             "img { max-width:100%; height:auto; }"
                             f"body {{ font-size:{font_size}px; }}"
+                            # Readers can scale the header's font as well as body text.
+                            f"td.system-crest {{ font-size:{font_size}px !important; line-height:1.8 !important; }}"
                         ))
                         if theme == "dark":
                             # Books' night theme can replace solid cell colors
@@ -71,6 +74,7 @@ class EpubLayoutTest(unittest.TestCase):
                                 dragons: [...t.querySelectorAll('img.system-dragon')].map(e => ({
                                     width: rect(e).width, height: rect(e).height,
                                     loaded: e.complete && e.naturalWidth > 0,
+                                    top: rect(e).top - crest.top,
                                     inside: rect(e).left >= crest.left && rect(e).right <= crest.right
                                 })),
                                 fill: getComputedStyle(t.querySelector('.system-body')).backgroundImage,
@@ -89,6 +93,7 @@ class EpubLayoutTest(unittest.TestCase):
                                 self.assertTrue(dragon["loaded"] and dragon["inside"])
                                 self.assertGreaterEqual(dragon["width"], 24)
                                 self.assertGreaterEqual(dragon["height"], 19)
+                                self.assertAlmostEqual(dragon["top"], 3.75, delta=0.1)
                             for index, (left, right) in enumerate(result["cornerEdges"]):
                                 self.assertAlmostEqual(left if index % 2 == 0 else right,
                                                        result["left"] if index % 2 == 0 else result["right"], delta=1)
@@ -96,12 +101,19 @@ class EpubLayoutTest(unittest.TestCase):
                             expected_fill = "rgb(23, 57, 87)" if theme == "dark" else "rgb(45, 106, 173)"
                             self.assertIn(expected_fill, result["fill"])
                         for window in page.locator("table.system-window").all():
+                            crest_left = window.locator(".system-crest").evaluate(
+                                "e => e.getBoundingClientRect().left - e.closest('table').getBoundingClientRect().left"
+                            )
                             with Image.open(BytesIO(window.screenshot())) as image:
                                 rgb = image.convert("RGB")
                                 panel = (23, 57, 87) if theme == "dark" else (45, 106, 173)
                                 # The side gutter must retain the blue fill even
                                 # when every cell's background-color is black.
                                 self.assertEqual(rgb.getpixel((12, rgb.height // 2)), panel)
+                                # The top stroke continues through the crest,
+                                # visible between each dragon and the label.
+                                for offset in (31, 100):
+                                    self.assertEqual(rgb.getpixel((round(crest_left + offset), 13)), (230, 200, 106))
                                 # Gold reaches both outer edges from the upper
                                 # corners down through the lower corners.
                                 for x in (1, rgb.width - 2):
