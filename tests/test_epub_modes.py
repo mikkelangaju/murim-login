@@ -53,24 +53,52 @@ class EpubModesTest(unittest.TestCase):
                             doc = ET.fromstring(archive.read(name))
                             self.assertEqual(len(doc.findall(f".//{NS}blockquote")), 1)
                             self.assertIn(f"Note for chapter {number}.", "".join(doc.itertext()))
-                            self.assertEqual(len(doc.findall(f".//{NS}a[@class='footnote-ref']")), 1)
+                            self.assertEqual(sum("footnote-ref" in element.get("class", "").split()
+                                                 for element in doc.iter(f"{NS}a")), 1)
                             self.assertEqual(len(doc.findall(f".//{NS}li")), 2)
-                            body = doc.find(f".//*[@class='system-body']")
+                            body = next(element for element in doc.iter()
+                                        if "system-body" in element.get("class", "").split())
                             text.append(" ".join("".join(body.itertext()).split()))
                             if color:
-                                window = doc.find(f".//{NS}table[@class='system-window']")
+                                window = next((element for element in doc.iter(f"{NS}div")
+                                               if "system-window" in element.get("class", "").split()), None)
                                 self.assertIsNotNone(window)
-                                # One cell preserves Books' zoom without decorative columns.
-                                self.assertEqual(len(window.findall(f".//{NS}td")), 1)
+                                self.assertEqual(window.get("lang"), "en")
+                                # Normal blocks bypass Books' recoloring native table viewer.
+                                self.assertFalse(window.findall(f".//{NS}table"))
                                 self.assertIn("ibooks-dark-theme-use-custom-text-color",
-                                              window.find(f".//{NS}td").get("class", "").split())
+                                              window.find(f".//{NS}div").get("class", "").split())
                                 for element in window.iter():
+                                    if element.tag != f"{NS}img":
+                                        self.assertIn("ibooks-dark-theme-use-custom-text-color",
+                                                      element.get("class", "").split())
                                     self.assertIn("color: #ffffff !important", element.get("style", ""))
                                     self.assertIn("-webkit-text-fill-color: #ffffff !important", element.get("style", ""))
+                                    self.assertIn('font-family: Georgia, "Times New Roman", serif !important',
+                                                  element.get("style", ""))
                                     if "system-" in element.get("class", ""):
                                         self.assertTrue(element.get("style"))
                                 self.assertEqual(len(doc.findall(f".//{NS}img[@class='system-dragon']")), 2)
                                 self.assertEqual(len(doc.findall(f".//{NS}div[@class='scene-separator']")), 1)
+                                opener = next(element for element in window.iter(f"{NS}a")
+                                              if "system-open" in element.get("class", "").split())
+                                popup_path = "EPUB/text/" + opener.get("href")
+                                popup = ET.fromstring(archive.read(popup_path))
+                                popup_body = next(element for element in popup.iter()
+                                                  if "system-body" in element.get("class", "").split())
+                                self.assertEqual("".join(body.itertext()), "".join(popup_body.itertext()))
+                                self.assertFalse(popup.findall(f".//{NS}table"))
+                                self.assertTrue(popup.find(f"{NS}head/{NS}style").text)
+                                opf = "{http://www.idpf.org/2007/opf}"
+                                package_name = next(n for n in archive.namelist() if n.endswith(".opf"))
+                                package = ET.fromstring(archive.read(package_name))
+                                item = next(element for element in package.iter(f"{opf}item")
+                                            if element.get("href") == "text/" + opener.get("href"))
+                                self.assertIn("scripted", item.get("properties", "").split())
+                                self.assertIsNotNone(popup.find(f"{NS}head/{NS}script"))
+                                reference = next(element for element in package.iter(f"{opf}itemref")
+                                                 if element.get("idref") == item.get("id"))
+                                self.assertEqual(reference.get("linear"), "no")
                             else:
                                 self.assertIsNotNone(doc.find(f".//{NS}div[@class='system-window-simple']"))
                                 self.assertFalse(doc.findall(f".//{NS}table"))

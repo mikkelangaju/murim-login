@@ -8,6 +8,7 @@ PDF uses Typst, and EPUB uses Pandoc's file-scope mode with the book stylesheet.
 from __future__ import annotations
 
 import argparse
+from copy import deepcopy
 import os
 import posixpath
 import re
@@ -17,7 +18,7 @@ import sys
 import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from zipfile import ZipFile
+from zipfile import ZIP_DEFLATED, ZipFile
 from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -27,6 +28,8 @@ FILTER = ROOT / "tools" / "system-window.lua"
 STYLESHEET = ROOT / "tools" / "book.css"
 COLOR_STYLESHEET = ROOT / "tools" / "epub-color.css"
 SIMPLE_STYLESHEET = ROOT / "tools" / "epub-simple.css"
+POPUP_STYLESHEET = ROOT / "tools" / "epub-popup.css"
+POPUP_SCRIPT = ROOT / "tools" / "epub-popup.js"
 BOOK_TYP = ROOT / "tools" / "book.typ"
 TYPST_TEMPLATE = ROOT / "tools" / "typst-template.typ"
 COLOPHON_TYP = ROOT / "tools" / "colophon.typ"
@@ -122,7 +125,7 @@ def run_pandoc(
 
 
 def inline_epub_windows(path: Path) -> None:
-    """Copy the authored window class rules into self-contained zoomable tables.
+    """Style panels and link them to authored, nonlinear enlargement documents.
 
     This deliberately reads only the marked simple-class section, not arbitrary
     CSS selectors or media blocks. The same declarations style page and popup.
@@ -135,7 +138,7 @@ def inline_epub_windows(path: Path) -> None:
         name: " ".join(declarations.split())
         for name, declarations in re.findall(r"\.(system-[\w-]+)\s*\{([^{}]*)\}", section)
     }
-    # Keep raised note references when Books detaches a table from chapter CSS.
+    # Keep note references consistent in the chapter and enlargement.
     reference_style = re.search(r"\.footnote-ref\s*\{([^{}]*)\}", STYLESHEET.read_text(encoding="utf-8"))
     styles["footnote-ref"] = " ".join(reference_style.group(1).split())
     tag_classes = {
@@ -147,18 +150,33 @@ def inline_epub_windows(path: Path) -> None:
     ET.register_namespace("epub", "http://www.idpf.org/2007/ops")
     with tempfile.TemporaryDirectory(dir=path.parent) as directory:
         target = Path(directory) / path.name
-        with ZipFile(path) as source, ZipFile(target, "w") as output:
+        with ZipFile(path) as source, ZipFile(target, "w", compression=ZIP_DEFLATED) as output:
+            package_name = next(name for name in source.namelist() if name.endswith(".opf"))
+            package = ET.fromstring(source.read(package_name))
+            opf = "{http://www.idpf.org/2007/opf}"
+            manifest = package.find(f"{opf}manifest")
+            spine = package.find(f"{opf}spine")
+            if manifest is None or spine is None:
+                raise ValueError("EPUB package is missing its manifest or spine")
             for entry in source.infolist():
+                if entry.filename == package_name:
+                    continue
                 data = source.read(entry)
                 if entry.filename.endswith(".xhtml"):
                     doc = ET.fromstring(data)
-                    windows = doc.findall(f".//{ns}table[@class='system-window']")
-                    for window in windows:
+                    windows = [element for element in doc.iter(f"{ns}table")
+                               if "system-window" in element.get("class", "").split()]
+                    for index, window in enumerate(windows, 1):
+                        # The standalone view need not retain the chapter's language.
+                        window.set("lang", "en")
+                        window.set("{http://www.w3.org/XML/1998/namespace}lang", "en")
                         for element in window.iter():
                             classes = element.get("class", "").split()
-                            if "system-cell" in classes:
-                                # Apple's opt-in keeps authored colors in Books themes.
-                                classes.append("ibooks-dark-theme-use-custom-text-color")
+                            if element.tag != f"{ns}img":
+                                # Apply the custom-color opt-in to text elements
+                                # directly as well as their containers.
+                                if "ibooks-dark-theme-use-custom-text-color" not in classes:
+                                    classes.append("ibooks-dark-theme-use-custom-text-color")
                             tag_class = tag_classes.get(element.tag.removeprefix(ns))
                             if tag_class:
                                 classes.append(tag_class)
@@ -173,10 +191,91 @@ def inline_epub_windows(path: Path) -> None:
                             if classes:
                                 element.set("class", " ".join(classes))
                             element.set("style", "; ".join(filter(None, [element.get("style", ""), *declarations])))
+                        # A real table invokes Books' theme-recoloring table viewer.
+                        # Use a normal block and a link to a nonlinear spine document
+                        # instead, so the enlargement has its own complete stylesheet.
+                        cell = window.find(f".//{ns}td")
+                        if cell is None:
+                            raise ValueError(f"System window without a cell in {entry.filename}")
+                        window.tag = f"{ns}div"
+                        cell.tag = f"{ns}div"
+                        window[:] = [cell]
+                        window.set("role", "group")
+                        window.set("aria-label", "System")
+                        window.set("data-system-window", "")
+                        window_id = f"system-window-{index}"
+                        window.set("id", window_id)
+                        popup_name = f"window-{Path(entry.filename).stem}-{index}.xhtml"
+                        popup_path = posixpath.join(posixpath.dirname(entry.filename), popup_name)
+                        popup_id = f"window-{Path(entry.filename).stem}-{index}"
+                        output.writestr(popup_path, epub_window_document(window, doc, entry.filename))
+                        ET.SubElement(manifest, f"{opf}item", {
+                            "id": popup_id, "href": posixpath.relpath(popup_path, posixpath.dirname(package_name)),
+                            "media-type": "application/xhtml+xml", "properties": "scripted",
+                        })
+                        ET.SubElement(spine, f"{opf}itemref", {"idref": popup_id, "linear": "no"})
+                        # The empty, labelled link covers the panel without nesting
+                        # anchors. Existing links sit above it and still work.
+                        ET.SubElement(window, f"{ns}a", {
+                            "class": "system-open ibooks-dark-theme-use-custom-text-color", "href": popup_name,
+                            "aria-label": "Enlarge system window", "title": "Enlarge system window",
+                            "style": styles["system-open"] + "; " + styles["system-ink"],
+                        })
+                        for link in cell.iter(f"{ns}a"):
+                            link.set("style", link.get("style", "") + "; position: relative; z-index: 2")
                     if windows:
                         data = ET.tostring(doc, encoding="utf-8", xml_declaration=True)
                 output.writestr(entry, data)
+            ET.register_namespace("opf", opf[1:-1])
+            output.writestr(package_name, ET.tostring(package, encoding="utf-8", xml_declaration=True))
         target.replace(path)
+
+
+def epub_window_document(window: ET.Element, chapter: ET.Element, chapter_path: str) -> bytes:
+    """Keep real text and local note targets in a separately styled popup."""
+    ns = "{http://www.w3.org/1999/xhtml}"
+    epub = "{http://www.idpf.org/2007/ops}"
+    html = ET.Element(f"{ns}html", {"class": "system-popup", "lang": "en",
+                                    "{http://www.w3.org/XML/1998/namespace}lang": "en"})
+    head = ET.SubElement(html, f"{ns}head")
+    heading = chapter.find(f".//{ns}h1")
+    title = "".join(heading.itertext()).strip() if heading is not None else "Murim Login"
+    ET.SubElement(head, f"{ns}title").text = f"System — {title}"
+    ET.SubElement(head, f"{ns}meta", {
+        "name": "viewport", "content": "width=device-width, initial-scale=1, user-scalable=yes",
+    })
+    ET.SubElement(head, f"{ns}style").text = epub_stylesheet(True) + "\n" + POPUP_STYLESHEET.read_text(encoding="utf-8")
+    ET.SubElement(head, f"{ns}script", {"type": "text/javascript"}).text = POPUP_SCRIPT.read_text(encoding="utf-8")
+    body = ET.SubElement(html, f"{ns}body")
+    panel = deepcopy(window)
+    # Rem/em text follows the popup root font. Scale the authored pixel-sized
+    # frame, plaque and artwork by the same factor, keeping the canvas full-width.
+    # This avoids applying a second browser/CSS zoom on top of Books' page zoom.
+    for element in panel.iter():
+        style = element.get("style")
+        if style:
+            element.set("style", re.sub(r"(-?(?:\d+(?:\.\d+)?|\.\d+))px\b",
+                                       r"calc(\1px * var(--popup-scale, 1))", style))
+    body.append(panel)
+    # Copy only notes referenced by this panel; retain dictionary/search/VoiceOver
+    # text, and make other intra-chapter links return to their original targets.
+    chapter_ids = {element.get("id"): element for element in chapter.iter() if element.get("id")}
+    notes = set()
+    for link in window.iter(f"{ns}a"):
+        if "noteref" in link.get(f"{epub}type", "").split():
+            fragment = unquote(urlsplit(link.get("href", "")).fragment)
+            if fragment in chapter_ids and fragment not in notes:
+                notes.add(fragment)
+                body.append(deepcopy(chapter_ids[fragment]))
+    popup_ids = {element.get("id") for element in body.iter() if element.get("id")}
+    for link in body.iter(f"{ns}a"):
+        href = link.get("href", "")
+        if href.startswith("#") and unquote(href[1:]) not in popup_ids:
+            link.set("href", posixpath.basename(chapter_path) + href)
+    ET.SubElement(body, f"{ns}a", {
+        "href": f"{posixpath.basename(chapter_path)}#{window.get('id')}",
+    }).text = "Return to chapter"
+    return ET.tostring(html, encoding="utf-8", xml_declaration=True)
 
 
 def ensure_reader_dependencies(npm: str) -> None:

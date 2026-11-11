@@ -1,0 +1,40 @@
+/* Enlargement documents reflow to the phone instead of using book page sizes. */
+@page {
+  size: auto;
+  margin: 0;
+}
+
+html.system-popup {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  font-size: calc(100% * var(--popup-scale, 1));
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+.system-popup body {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  padding: 1rem 0.5rem;
+  overflow-wrap: anywhere;
+}
+
+.system-popup .system-window {
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: 100%;
+  margin: 0 0 1rem !important;
+}
+
+/* Table-style lists otherwise expand to the longest unbroken word. */
+.system-popup .system-list {
+  display: block !important;
+  box-sizing: border-box;
+  max-width: 100%;
+}
