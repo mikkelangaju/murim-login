@@ -12,6 +12,19 @@ local function ornament(name)
   return pandoc.path.join({repo, "reader", "src", "ornaments", name})
 end
 
+-- Raw HTML breaks are valid in HTML but must be closed in EPUB XHTML.
+function RawInline(inline)
+  if FORMAT:match("epub") and inline.format == "html" then
+    if inline.text:lower():match("^<br%s*/?>$") then
+      return pandoc.LineBreak()
+    end
+    -- Capitalized bracketed names are prose labels, not HTML elements.
+    if inline.text:match("^<%u[%w%s]*>$") then
+      return pandoc.Str(inline.text)
+    end
+  end
+end
+
 function HorizontalRule()
   if not FORMAT:match("typst") then
     return nil

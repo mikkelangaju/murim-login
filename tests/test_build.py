@@ -1,11 +1,32 @@
 import tempfile
 import unittest
 from pathlib import Path
+from zipfile import ZipFile
 
-from tools.build import BOOK_TYP, COLOPHON_TYP, COVER, READER, RIGHTS, TYPST_TEMPLATE, chapter_paths, pandoc_base, write_pdf_cover
+from tools.build import BOOK_TYP, COLOPHON_TYP, COVER, READER, RIGHTS, TYPST_TEMPLATE, chapter_paths, pandoc_base, run_pandoc, validate_epub, write_pdf_cover
 
 
 class BuildToolTest(unittest.TestCase):
+    def test_epub_raw_breaks_produce_valid_xhtml(self):
+        with tempfile.TemporaryDirectory() as temp:
+            source = Path(temp) / "chapter.md"
+            source.write_text("# Chapter 0\n\nBefore\n\n<br>\n\n**<Peace Guild>**\n\nAfter\n", encoding="utf-8")
+            target = Path(temp) / "book.epub"
+            run_pandoc([source], target, "epub3")
+            validate_epub(target)
+            with ZipFile(target) as archive:
+                content = b"".join(archive.read(n) for n in archive.namelist() if n.endswith(".xhtml"))
+            self.assertIn(b"<br />", content)
+            self.assertIn(b"&lt;Peace Guild&gt;", content)
+
+    def test_epub_validation_rejects_mismatched_tags(self):
+        with tempfile.TemporaryDirectory() as temp:
+            target = Path(temp) / "broken.epub"
+            with ZipFile(target, "w") as archive:
+                archive.writestr("EPUB/text/ch001.xhtml", "<html><p><br></p></html>")
+            with self.assertRaisesRegex(ValueError, "invalid EPUB XML in EPUB/text/ch001.xhtml"):
+                validate_epub(target)
+
     def test_chapter_selection_is_numeric_and_ordered(self):
         with tempfile.TemporaryDirectory() as temp:
             source = Path(temp)

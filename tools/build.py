@@ -12,7 +12,9 @@ import os
 import shutil
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
+from zipfile import ZipFile
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SOURCE = ROOT / "translations"
@@ -164,7 +166,18 @@ def build_pdf(paths: list[Path], output: Path) -> Path:
 def build_epub(paths: list[Path], output: Path, css: Path) -> Path:
     target = output / "murim-login.epub"
     run_pandoc(paths, target, "epub3", css, epub_cover=output / "cover.jpg", title=TITLE)
+    validate_epub(target)
     return target
+
+
+def validate_epub(path: Path) -> None:
+    with ZipFile(path) as archive:
+        for name in archive.namelist():
+            if name.endswith((".xhtml", ".xml", ".opf", ".ncx", ".svg")):
+                try:
+                    ET.fromstring(archive.read(name))
+                except ET.ParseError as error:
+                    raise ValueError(f"invalid EPUB XML in {name}: {error}") from error
 
 
 def copy_book_assets(output: Path) -> Path:
