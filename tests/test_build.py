@@ -165,7 +165,7 @@ class BuildToolTest(unittest.TestCase):
         css = epub_stylesheet(True)
         self.assertNotIn("#20242b", css)
         self.assertNotIn("--paper", css)
-        self.assertNotIn("color-scheme: light", css)
+        self.assertNotIn("color-scheme: light;", css)
         self.assertIn("color: inherit", css)
         self.assertNotIn("#3470aa", css)
         self.assertIn("#e6c86a", css)

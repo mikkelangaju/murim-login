@@ -212,15 +212,18 @@ class EpubLayoutTest(unittest.TestCase):
 
         source = ("# Chapter 0\n\n> **System**\n>\n> Points complete.\n\n"
                   "> **System**\n>\n> **Quest**\n>\n"
-                  "> Gather basic information and understand the situation.\n>\n"
+                  "> Gather *basic* information and <span>understand</span> the `situation`.\n>\n"
                   "> - Grade: Tutorial[^1]\n> - Rewards: Sturdy Martial Uniform Set\n\n[^1]: Tutorial note.\n")
         with color_chapter(source) as chapter, sync_playwright() as playwright:
             browser = playwright.webkit.launch()
             page = browser.new_page()
-            for width, font_size in ((320, 16), (700, 32), (1824, 32)):
-                with self.subTest(width=width, font_size=font_size):
+            for width, font_size, theme in (
+                (320, 16, "light"), (700, 32, "light"), (1824, 32, "light"),
+                (320, 16, "dark"), (700, 32, "dark"), (1824, 32, "dark"),
+            ):
+                with self.subTest(width=width, font_size=font_size, theme=theme):
                     page.set_viewport_size({"width": width, "height": 1400})
-                    page.emulate_media(color_scheme="light")
+                    page.emulate_media(color_scheme=theme)
                     page.goto(chapter.as_uri())
                     body_style = f"margin:0;padding:0;max-width:none;font-size:{font_size}px"
                     page.locator("body").evaluate("(e,s) => e.setAttribute('style',s)", body_style)
@@ -234,10 +237,24 @@ class EpubLayoutTest(unittest.TestCase):
                     detached.write_text(f'<html><head><base href="{chapter.as_uri()}"/></head>'
                                         f'<body style="{body_style}">{copies}</body></html>', encoding="utf-8")
                     page.goto(detached.as_uri())
+                    # Model a separate reader theme overriding author colors,
+                    # including leaf spans/emphasis and backgrounds, in both modes.
+                    page.add_style_tag(content=(
+                        "body * {color:#000 !important;-webkit-text-fill-color:#000 !important;"
+                        "color-scheme:light !important;}"
+                        "table,td,.system-header,.system-content,.system-footer,.system-plaque {"
+                        "background-color:#eee !important;background-image:none !important;}"
+                    ))
                     for index, table in enumerate(page.locator("table").all()):
                         self.assertEqual(table.screenshot(), baseline[index])
                         self.assertEqual(table.locator("td").count(), 1)
                         self.assertEqual(table.locator(".system-dragon").count(), 2)
+                        colors = table.locator("p,strong,em,span,code,a,li").evaluate_all("""es => es.map(e => ({
+                            ink:getComputedStyle(e).color, fill:getComputedStyle(e).webkitTextFillColor
+                        }))""")
+                        for color in colors:
+                            self.assertEqual(color["ink"], "rgb(255, 255, 255)")
+                            self.assertEqual(color["fill"], "rgb(255, 255, 255)")
             browser.close()
 
     def test_footnote_references_are_raised_without_changing_line_height(self):

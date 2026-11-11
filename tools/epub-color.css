@@ -20,7 +20,7 @@ img.scene-separator-art {
 /* BEGIN SYSTEM WINDOW INLINE
    build.py copies these simple class rules onto each table's elements. Books'
    enlargement view can then render the table without the chapter stylesheet.
-   Keep literal color fallbacks here; dark theme overrides follow this section. */
+   Keep both palettes inline, with literal fallbacks for older reading engines. */
 .system-window {
   width: 92%;
   margin: 1.8em auto 1.4em;
@@ -29,7 +29,7 @@ img.scene-separator-art {
   border-spacing: 0;
   border: 0;
   padding: 0;
-  background: transparent;
+  background: transparent !important;
   color: #ffffff;
   -webkit-text-fill-color: #ffffff;
   font-family: Helvetica, Arial, sans-serif;
@@ -46,7 +46,7 @@ img.scene-separator-art {
 .system-cell {
   padding: 0;
   border: 0;
-  background: transparent;
+  background: transparent !important;
   color: #ffffff;
   -webkit-text-fill-color: #ffffff;
   vertical-align: top;
@@ -61,11 +61,15 @@ img.scene-separator-art {
   margin: 0;
   padding: 0;
   border: 0;
-  background-color: transparent;
+  background-color: transparent !important;
   background-image:
     linear-gradient(to right, #e6c86a 7px, transparent 7px,
       transparent calc(100% - 7px), #e6c86a calc(100% - 7px)),
-    linear-gradient(to bottom, #e6c86a 7px, #2d6aad 7px);
+    linear-gradient(to bottom, #e6c86a 7px, #2d6aad 7px) !important;
+  background-image:
+    linear-gradient(to right, #e6c86a 7px, transparent 7px,
+      transparent calc(100% - 7px), #e6c86a calc(100% - 7px)),
+    linear-gradient(to bottom, #e6c86a 7px, light-dark(#2d6aad, #173957) 7px) !important;
   background-size: 100% 26px;
   background-position: left bottom;
   background-repeat: no-repeat;
@@ -109,8 +113,10 @@ img.scene-separator-art {
   height: 20px;
   margin: 0 7px;
   padding: 0;
-  background-color: #2a5f8c;
-  background-image: linear-gradient(#2a5f8c, #2a5f8c);
+  background-color: #2a5f8c !important;
+  background-color: light-dark(#2a5f8c, #173957) !important;
+  background-image: linear-gradient(#2a5f8c, #2a5f8c) !important;
+  background-image: linear-gradient(light-dark(#2a5f8c, #173957), light-dark(#2a5f8c, #173957)) !important;
   border: 1px solid #e6c86a;
   color: #ffffff;
   -webkit-text-fill-color: #ffffff;
@@ -147,8 +153,10 @@ img.scene-separator-art {
   padding: 0 19px;
   border-left: 7px solid #e6c86a;
   border-right: 7px solid #e6c86a;
-  background-color: #2d6aad;
-  background-image: linear-gradient(#2d6aad, #2d6aad);
+  background-color: #2d6aad !important;
+  background-color: light-dark(#2d6aad, #173957) !important;
+  background-image: linear-gradient(#2d6aad, #2d6aad) !important;
+  background-image: linear-gradient(light-dark(#2d6aad, #173957), light-dark(#2d6aad, #173957)) !important;
 }
 
 .system-body {
@@ -166,11 +174,16 @@ img.scene-separator-art {
   margin: 0;
   padding: 0;
   border: 0;
-  background-color: #2d6aad;
+  background-color: #2d6aad !important;
+  background-color: light-dark(#2d6aad, #173957) !important;
   background-image:
     linear-gradient(to right, #e6c86a 7px, transparent 7px,
       transparent calc(100% - 7px), #e6c86a calc(100% - 7px)),
-    linear-gradient(to top, #e6c86a 7px, #2d6aad 7px);
+    linear-gradient(to top, #e6c86a 7px, #2d6aad 7px) !important;
+  background-image:
+    linear-gradient(to right, #e6c86a 7px, transparent 7px,
+      transparent calc(100% - 7px), #e6c86a calc(100% - 7px)),
+    linear-gradient(to top, #e6c86a 7px, light-dark(#2d6aad, #173957) 7px) !important;
 }
 
 .system-paragraph {
@@ -216,25 +229,11 @@ img.scene-separator-art {
 }
 
 .system-last { margin-bottom: 0; }
-/* END SYSTEM WINDOW INLINE */
-
-/* Inline light colors survive detached table views. Theme images use explicit
-   overrides so Books' replacement solid colors cannot punch holes in the frame. */
-@media (prefers-color-scheme: dark) {
-  .system-header {
-    background-image:
-      linear-gradient(to right, #e6c86a 7px, transparent 7px,
-        transparent calc(100% - 7px), #e6c86a calc(100% - 7px)),
-      linear-gradient(to bottom, #e6c86a 7px, #173957 7px) !important;
-  }
-  .system-content, .system-plaque {
-    background-color: #173957 !important;
-    background-image: linear-gradient(#173957, #173957) !important;
-  }
-  .system-footer {
-    background-image:
-      linear-gradient(to right, #e6c86a 7px, transparent 7px,
-        transparent calc(100% - 7px), #e6c86a calc(100% - 7px)),
-      linear-gradient(to top, #e6c86a 7px, #173957 7px) !important;
-  }
+/* Applied inline to every window descendant, including em/span/a elements
+   which Books may recolor directly rather than letting them inherit. */
+.system-ink {
+  color-scheme: light dark !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
+/* END SYSTEM WINDOW INLINE */

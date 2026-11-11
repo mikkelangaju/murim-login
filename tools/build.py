@@ -125,7 +125,7 @@ def inline_epub_windows(path: Path) -> None:
     """Copy the authored window class rules into self-contained zoomable tables.
 
     This deliberately reads only the marked simple-class section, not arbitrary
-    CSS selectors or theme overrides. The same declarations style page and popup.
+    CSS selectors or media blocks. The same declarations style page and popup.
     """
     css = COLOR_STYLESHEET.read_text(encoding="utf-8")
     section = css.split("/* BEGIN SYSTEM WINDOW INLINE", 1)[1].split("/* END SYSTEM WINDOW INLINE */", 1)[0]
@@ -156,6 +156,9 @@ def inline_epub_windows(path: Path) -> None:
                     for window in windows:
                         for element in window.iter():
                             classes = element.get("class", "").split()
+                            if "system-cell" in classes:
+                                # Apple's opt-in keeps authored colors in Books themes.
+                                classes.append("ibooks-dark-theme-use-custom-text-color")
                             tag_class = tag_classes.get(element.tag.removeprefix(ns))
                             if tag_class:
                                 classes.append(tag_class)
@@ -163,9 +166,13 @@ def inline_epub_windows(path: Path) -> None:
                                 last = element[-1]
                                 last.set("class", (last.get("class", "") + " system-last").strip())
                             declarations = [styles[name] for name in classes if name in styles]
-                            if declarations:
+                            # Reader theme rules may target text descendants directly.
+                            # Protect every element, including otherwise unstyled spans,
+                            # emphasis and links, without affecting surrounding prose.
+                            declarations.append(styles["system-ink"])
+                            if classes:
                                 element.set("class", " ".join(classes))
-                                element.set("style", "; ".join(filter(None, [element.get("style", ""), *declarations])))
+                            element.set("style", "; ".join(filter(None, [element.get("style", ""), *declarations])))
                     if windows:
                         data = ET.tostring(doc, encoding="utf-8", xml_declaration=True)
                 output.writestr(entry, data)

@@ -62,7 +62,11 @@ class EpubModesTest(unittest.TestCase):
                                 self.assertIsNotNone(window)
                                 # One cell preserves Books' zoom without decorative columns.
                                 self.assertEqual(len(window.findall(f".//{NS}td")), 1)
+                                self.assertIn("ibooks-dark-theme-use-custom-text-color",
+                                              window.find(f".//{NS}td").get("class", "").split())
                                 for element in window.iter():
+                                    self.assertIn("color: #ffffff !important", element.get("style", ""))
+                                    self.assertIn("-webkit-text-fill-color: #ffffff !important", element.get("style", ""))
                                     if "system-" in element.get("class", ""):
                                         self.assertTrue(element.get("style"))
                                 self.assertEqual(len(doc.findall(f".//{NS}img[@class='system-dragon']")), 2)

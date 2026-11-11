@@ -348,14 +348,21 @@ the old header's dragons in Apple Books. Pixel checks also verify
 the continuous gold lip beyond all four corners and blue fill under a simulated
 night-mode panel-color override. Additional checks move tables across CSS
 column/page boundaries and compare their rendering after extraction into a
-standalone view without chapter CSS or the table's root class. The Books tap
-interaction itself still requires an iOS device check.
+standalone view without chapter CSS or the table's root class, in both light
+and dark mode. The detached checks also inject competing theme colors for text
+and panel backgrounds. The Books tap interaction itself still requires an iOS
+device check.
 
 `tools/build.py` copies the simple class declarations in the marked inline
 section of `tools/epub-color.css` onto the generated window elements. Keep these
-rules self-contained, with literal color fallbacks; dark-mode overrides stay
-outside that section. This gives the enlargement view its own layout, colors,
-and text styling without depending on inherited chapter styles.
+rules self-contained. Both palettes use inline `light-dark()` colors, with
+literal blue fallbacks for older reading engines, so the enlargement view does
+not depend on chapter media rules. Its elements declare `color-scheme: light dark`.
+Panel backgrounds and white text use inline `!important` declarations to resist
+reader theme overrides, and every descendant receives the white text guard,
+including emphasis, spans, and links. The cell also carries Apple's
+`ibooks-dark-theme-use-custom-text-color` class. Surrounding chapter text keeps
+the reader's selected colors.
 
 ## Address Pass
 
