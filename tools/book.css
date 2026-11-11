@@ -3,23 +3,9 @@
   margin: 18mm 16mm 20mm;
 }
 
-:root {
-  color-scheme: light;
-  --ink: #20242b;
-  --muted: #68717d;
-  --paper: #fffdf8;
-  --panel: #f2f5f8;
-  --frame: #657284;
-  --accent: #34495e;
-}
-
-html {
-  background: var(--paper);
-}
-
+/* Let EPUB readers supply page and text colors for their selected theme. */
 body {
-  color: var(--ink);
-  background: var(--paper);
+  color: inherit;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 1rem;
   line-height: 1.62;
@@ -29,18 +15,18 @@ body {
 }
 
 .chapter-nav {
-  color: var(--muted);
+  color: inherit;
   font-family: system-ui, sans-serif;
   font-size: 0.85rem;
   margin: 0 0 1.5rem;
 }
 
 .chapter-nav a {
-  color: var(--accent);
+  color: inherit;
 }
 
 .chapter-position {
-  color: var(--muted);
+  color: inherit;
   margin-left: 0.5rem;
 }
 
@@ -58,7 +44,7 @@ body {
 }
 
 h1 {
-  color: var(--accent);
+  color: inherit;
   font-size: 1.8rem;
   line-height: 1.2;
   margin: 0 0 2rem;
@@ -78,7 +64,7 @@ p {
 
 blockquote {
   border-left: 0.2rem solid #b9c2cc;
-  color: #3e4854;
+  color: inherit;
   margin: 1rem 0;
   padding: 0.1rem 1rem;
 }
@@ -93,7 +79,7 @@ table.system-window {
   border-collapse: collapse;
   border-spacing: 0;
   background-color: transparent;
-  color: #20242b;
+  color: inherit;
   font-family: Helvetica, Arial, sans-serif;
   font-size: 0.92em;
   font-style: normal;
@@ -225,7 +211,7 @@ table.system-head td.system-badge {
   vertical-align: middle;
   background-color: transparent;
   border: 2px solid #e6c86a;
-  color: #20242b;
+  color: inherit;
   font-family: Helvetica, Arial, sans-serif;
   font-size: 11px;
   font-weight: bold;
@@ -236,7 +222,7 @@ table.system-head td.system-badge {
 }
 
 .system-plaque strong {
-  color: #20242b;
+  color: inherit;
   font-weight: bold;
 }
 
@@ -252,7 +238,7 @@ table.system-window td.system-body {
 .system-window ul,
 .system-window ol,
 .system-window li {
-  color: #20242b;
+  color: inherit;
   font-weight: bold;
 }
 
@@ -281,19 +267,19 @@ table.system-window td.system-body {
 }
 
 .system-window strong {
-  color: #20242b;
+  color: inherit;
   font-weight: bold;
 }
 
 .system-window code {
   font-family: Helvetica, Arial, sans-serif;
-  color: #20242b;
+  color: inherit;
   font-weight: bold;
 }
 
 .footnotes {
   border-top: 1px solid #c3ccd5;
-  color: var(--muted);
+  color: inherit;
   font-size: 0.88rem;
   margin-top: 3rem;
   padding-top: 1rem;
