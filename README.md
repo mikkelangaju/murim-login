@@ -182,7 +182,19 @@ Markdown is the canonical format.
 
 Every push to `master` automatically rebuilds and deploys the web reader through GitHub Actions. The reader supports chapter navigation, filtering, reading progress, configurable width/font size, light and dark themes, and related reading features.
 
-A second workflow builds the complete translation as **PDF and EPUB** and updates a rolling GitHub release. The web version, EPUB, and PDF therefore all originate from the same translated Markdown.
+A second workflow builds the complete translation as **PDF and two EPUB editions** and updates a rolling GitHub release. The web version, EPUB, and PDF therefore all originate from the same translated Markdown.
+
+The default EPUB is designed for black-and-white Kindle reading, with simple
+system-message frames and reader-controlled colors. Enable the illustrated
+blue/gold design and yin-yang scene separators with `--full-color-epub`:
+
+```bash
+python tools/build.py --format epub                    # build/murim-login.epub
+python tools/build.py --format epub --full-color-epub  # build/murim-login-color.epub
+```
+
+Both editions preserve chapter navigation and pop-up footnote links. PDF and
+website styling are independent of this option.
 
 ```text
 translations/*.md

@@ -4,7 +4,7 @@ from pathlib import Path
 from zipfile import ZipFile
 import xml.etree.ElementTree as ET
 
-from tools.build import BOOK_TYP, COLOPHON_TYP, COVER, READER, RIGHTS, TYPST_TEMPLATE, chapter_paths, pandoc_base, run_pandoc, validate_epub, write_pdf_cover
+from tools.build import BOOK_TYP, COLOPHON_TYP, COVER, READER, RIGHTS, TYPST_TEMPLATE, chapter_paths, epub_stylesheet, pandoc_base, run_pandoc, validate_epub, write_pdf_cover
 
 
 class BuildToolTest(unittest.TestCase):
@@ -26,7 +26,7 @@ class BuildToolTest(unittest.TestCase):
             source = Path(temp) / "chapter.md"
             source.write_text("# Chapter 0\n\nBefore.\n\n---\n\nAfter.\n", encoding="utf-8")
             target = Path(temp) / "book.epub"
-            run_pandoc([source], target, "epub3")
+            run_pandoc([source], target, "epub3", full_color_epub=True)
             validate_epub(target)
             ns = "{http://www.w3.org/1999/xhtml}"
             with ZipFile(target) as archive:
@@ -149,7 +149,7 @@ class BuildToolTest(unittest.TestCase):
         self.assertIn('rgb("#3470aa")', book)
         self.assertIn('rgb("#2d6aad")', book)
         self.assertNotIn('rgb("#245a96")', book)
-        css = (READER.parent / "tools" / "book.css").read_text(encoding="utf-8")
+        css = epub_stylesheet(True)
         self.assertNotIn("#20242b", css)
         self.assertNotIn("--paper", css)
         self.assertNotIn("color-scheme: light", css)

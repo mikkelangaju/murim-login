@@ -6,7 +6,7 @@ on:
     paths:
       - "translations/**"
       - "tools/build.py"
-      - "tools/book.css"
+      - "tools/*.css"
       - "tools/system-window.lua"
       - "tools/*.typ"
       - "tools/fonts/**"
@@ -46,8 +46,11 @@ jobs:
           sudo apt-get install -y fonts-noto-core fonts-noto-extra fonts-noto-mono
           sudo fc-cache -f
 
-      - name: Build PDF and EPUB
-        run: python tools/build.py --format pdf && python tools/build.py --format epub
+      - name: Build PDF and both EPUB editions
+        run: |
+          python tools/build.py --format pdf
+          python tools/build.py --format epub
+          python tools/build.py --format epub --full-color-epub
 
       - name: Publish rolling release
         env:
@@ -58,11 +61,11 @@ jobs:
           title="Murim Login"
           sha="${GITHUB_SHA:0:7}"
           chapters="$(find translations -maxdepth 1 -name '[0-9][0-9][0-9][0-9].md' | wc -l)"
-          notes="$(printf 'PDF and EPUB from `%s` (%s chapters). This release is overwritten on every master build.' "$sha" "$chapters")"
+          notes="$(printf 'PDF, simple Kindle EPUB (murim-login.epub), and full-color EPUB (murim-login-color.epub) from `%s` (%s chapters). This release is overwritten on every master build.' "$sha" "$chapters")"
           if gh release view "$tag" >/dev/null 2>&1; then
-            gh release upload "$tag" build/murim-login.pdf build/murim-login.epub --clobber
+            gh release upload "$tag" build/murim-login.pdf build/murim-login.epub build/murim-login-color.epub --clobber
             gh release edit "$tag" --title "$title" --notes "$notes"
           else
-            gh release create "$tag" build/murim-login.pdf build/murim-login.epub \
+            gh release create "$tag" build/murim-login.pdf build/murim-login.epub build/murim-login-color.epub \
               --title "$title" --notes "$notes"
           fi

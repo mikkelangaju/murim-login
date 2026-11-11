@@ -23,6 +23,8 @@ DEFAULT_SOURCE = ROOT / "translations"
 DEFAULT_OUTPUT = ROOT / "build"
 FILTER = ROOT / "tools" / "system-window.lua"
 STYLESHEET = ROOT / "tools" / "book.css"
+COLOR_STYLESHEET = ROOT / "tools" / "epub-color.css"
+SIMPLE_STYLESHEET = ROOT / "tools" / "epub-simple.css"
 BOOK_TYP = ROOT / "tools" / "book.typ"
 TYPST_TEMPLATE = ROOT / "tools" / "typst-template.typ"
 COLOPHON_TYP = ROOT / "tools" / "colophon.typ"
@@ -79,10 +81,13 @@ def run_pandoc(
     title: str = TITLE,
     pdf: bool = False,
     include_before: list[Path] | None = None,
+    full_color_epub: bool = False,
 ) -> None:
     command = pandoc_base(paths, output_format)
     command.append(f"--metadata=title={title}")
     command.append(f"--metadata=rights={RIGHTS}")
+    if output_format == "epub3" and full_color_epub:
+        command.append("--metadata=full-color-epub:true")
     if css is not None:
         command.append(f"--css={css_ref or css.name}")
     if epub_cover is not None:
@@ -165,9 +170,10 @@ def build_pdf(paths: list[Path], output: Path) -> Path:
     return target
 
 
-def build_epub(paths: list[Path], output: Path, css: Path) -> Path:
-    target = output / "murim-login.epub"
-    run_pandoc(paths, target, "epub3", css, epub_cover=output / "cover.jpg", title=TITLE)
+def build_epub(paths: list[Path], output: Path, css: Path, *, full_color_epub: bool = False) -> Path:
+    target = output / ("murim-login-color.epub" if full_color_epub else "murim-login.epub")
+    run_pandoc(paths, target, "epub3", css, epub_cover=output / "cover.jpg", title=TITLE,
+               full_color_epub=full_color_epub)
     validate_epub(target)
     return target
 
@@ -202,9 +208,14 @@ def validate_epub(path: Path) -> None:
                     raise ValueError(f"broken EPUB link in {name}: {href}")
 
 
-def copy_book_assets(output: Path) -> Path:
-    css = output / "book.css"
-    shutil.copyfile(STYLESHEET, css)
+def epub_stylesheet(full_color_epub: bool = False) -> str:
+    mode = COLOR_STYLESHEET if full_color_epub else SIMPLE_STYLESHEET
+    return STYLESHEET.read_text(encoding="utf-8") + "\n" + mode.read_text(encoding="utf-8")
+
+
+def copy_book_assets(output: Path, *, full_color_epub: bool = False) -> Path:
+    css = output / ("book-color.css" if full_color_epub else "book-simple.css")
+    css.write_text(epub_stylesheet(full_color_epub), encoding="utf-8")
     shutil.copyfile(COVER, output / "cover.jpg")
     return css
 
@@ -220,11 +231,11 @@ def build(args: argparse.Namespace) -> list[Path]:
     if args.format in {"all", "html"}:
         produced.extend(build_html(args.output, args.chapters or None))
     if args.format in {"all", "pdf", "epub"}:
-        css = copy_book_assets(args.output)
+        css = copy_book_assets(args.output, full_color_epub=args.full_color_epub)
         if args.format in {"all", "pdf"}:
             produced.append(build_pdf(paths, args.output))
         if args.format in {"all", "epub"}:
-            produced.append(build_epub(paths, args.output, css))
+            produced.append(build_epub(paths, args.output, css, full_color_epub=args.full_color_epub))
     return produced
 
 
@@ -234,6 +245,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--source", type=Path, default=DEFAULT_SOURCE)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--format", choices=("all", "html", "pdf", "epub"), default="all")
+    parser.add_argument("--full-color-epub", action="store_true",
+                        help="use illustrated blue/gold EPUB panels and yin-yang scene breaks; default: simple monochrome EPUB")
     args = parser.parse_args(argv)
     try:
         for path in build(args):

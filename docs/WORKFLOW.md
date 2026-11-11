@@ -310,9 +310,21 @@ The pre-master snapshot remains at `reviews/mastering/NNNN/baseline.md`.
 
 Run `python tools/build.py`; select chapters and formats as documented by
 `python tools/build.py --help`. Styling lives in `tools/system-window.lua` and
-`tools/book.css`.
+`tools/book.css` (shared), `tools/epub-simple.css`, and `tools/epub-color.css`.
 
-EPUB system-window and yin-yang scene-separator PNGs are transparent renders of the SVG masters in
+`python tools/build.py --format epub` builds `build/murim-login.epub`, the
+default simple edition for black-and-white Kindle readers: thin frames,
+reader-supplied ink and page colors, real-text system headings, and short
+horizontal scene dividers. It contains no decorative interior images.
+
+Add `--full-color-epub` to build `build/murim-login-color.epub` with blue/gold
+system windows, transparent corner/dragon artwork, and yin-yang scene breaks.
+The flag affects EPUB only; PDF and HTML styling are independent. Both editions
+share chapter splitting, XHTML/link validation, correct chapter-local footnotes,
+and hidden footnote divider lines. The release workflow publishes both EPUBs.
+
+Full-color EPUB system-window and scene-separator PNGs are transparent renders
+of the SVG masters in
 `reader/src/ornaments/`. Regenerate them with `python tools/render_ornaments.py`
 (requires `rsvg-convert`, provided by `librsvg2-bin` on Ubuntu). Keep the alpha
 channel so reader themes show through the ornaments.

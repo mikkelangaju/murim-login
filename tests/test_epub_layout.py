@@ -9,11 +9,60 @@ import tempfile
 import unittest
 from zipfile import ZipFile
 
-from tools.build import STYLESHEET, run_pandoc, validate_epub
+from tools.build import epub_stylesheet, run_pandoc, validate_epub
 
 
 @unittest.skipUnless(os.environ.get("MURIM_WEBKIT_QA") == "1", "opt-in WebKit layout QA")
 class EpubLayoutTest(unittest.TestCase):
+    def test_simple_panels_reflow_and_use_reader_colors(self):
+        from playwright.sync_api import sync_playwright
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "chapter.md"
+            source.write_text(
+                "# Chapter 0\n\n> **System**\n>\n"
+                "> Applying the Integrated Language Pack.\n\nAfter.\n\n"
+                "> **System**\n>\n> **Quest**\n>\n"
+                "> Gather basic information and understand the situation.\n>\n"
+                "> - Grade: Tutorial (Chain Quest)\n"
+                "> - Restriction: First-time players\n"
+                "> - Rewards: Sturdy Martial Uniform Set\n\n---\n\nNext scene.\n",
+                encoding="utf-8",
+            )
+            (root / "book.css").write_text(epub_stylesheet(), encoding="utf-8")
+            epub = root / "test.epub"
+            run_pandoc([source], epub, "epub3", root / "book.css")
+            validate_epub(epub)
+            with ZipFile(epub) as archive:
+                archive.extractall(root / "unpacked")
+            with sync_playwright() as playwright:
+                browser = playwright.webkit.launch()
+                page = browser.new_page()
+                for width, font_size, dark in ((320, 16, False), (320, 32, False), (390, 24, True), (700, 32, True)):
+                    with self.subTest(width=width, font_size=font_size, dark=dark):
+                        page.set_viewport_size({"width": width, "height": 1100})
+                        page.goto((root / "unpacked/EPUB/text/ch001.xhtml").as_uri())
+                        ink = "white" if dark else "black"
+                        paper = "black" if dark else "white"
+                        page.add_style_tag(content=f"body {{font-size:{font_size}px;color:{ink};background:{paper};}}")
+                        panels = page.locator(".system-window-simple").evaluate_all("""es => es.map(e => {
+                            const r=e.getBoundingClientRect(), s=getComputedStyle(e);
+                            return {left:r.left, right:r.right, overflow:e.scrollWidth>r.width+1,
+                                    border:s.borderTopColor, ink:s.color, fill:s.backgroundColor,
+                                    images:e.querySelectorAll('img').length};
+                        })""")
+                        self.assertEqual(len(panels), 2)
+                        for panel in panels:
+                            self.assertGreaterEqual(panel["left"], 0)
+                            self.assertLessEqual(panel["right"], width)
+                            self.assertFalse(panel["overflow"])
+                            self.assertEqual(panel["border"], panel["ink"])
+                            self.assertEqual(panel["ink"], "rgb(255, 255, 255)" if dark else "rgb(0, 0, 0)")
+                            self.assertEqual(panel["fill"], "rgba(0, 0, 0, 0)")
+                            self.assertEqual(panel["images"], 0)
+                browser.close()
+
     def test_frame_and_dragons_survive_reader_image_rules(self):
         from PIL import Image
         from playwright.sync_api import sync_playwright
@@ -31,9 +80,9 @@ class EpubLayoutTest(unittest.TestCase):
                 "> - Rewards: Sturdy Martial Uniform Set\n\n---\n\nNext scene.\n",
                 encoding="utf-8",
             )
-            (root / "book.css").write_bytes(STYLESHEET.read_bytes())
+            (root / "book.css").write_text(epub_stylesheet(True), encoding="utf-8")
             epub = root / "test.epub"
-            run_pandoc([source], epub, "epub3", root / "book.css")
+            run_pandoc([source], epub, "epub3", root / "book.css", full_color_epub=True)
             validate_epub(epub)
             with ZipFile(epub) as archive:
                 archive.extractall(root / "unpacked")

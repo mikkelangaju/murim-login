@@ -1,5 +1,10 @@
 -- Style only blockquotes explicitly headed "System".
 -- Other blockquotes, such as the Product User Manual, stay ordinary quotes.
+local full_color_epub = false
+
+function Meta(meta)
+  full_color_epub = meta["full-color-epub"] == true
+end
 
 local function is_system(block)
   local first = block.content[1]
@@ -35,7 +40,7 @@ function Div(block)
 end
 
 function HorizontalRule()
-  if FORMAT:match("epub") then
+  if FORMAT:match("epub") and full_color_epub then
     return pandoc.Div({pandoc.Plain({pandoc.Image(
       {}, ornament("yin-yang.png"), "",
       pandoc.Attr("", {"scene-separator-art"}, {width = "22", height = "22"})
@@ -68,6 +73,17 @@ function BlockQuote(block)
     end
     table.insert(result, pandoc.RawBlock("typst", "]"))
     return result
+  end
+
+  if FORMAT:match("epub") and not full_color_epub then
+    local body = {}
+    for index = 2, #block.content do
+      body[#body + 1] = block.content[index]
+    end
+    return pandoc.Div({
+      pandoc.Div({pandoc.Plain({pandoc.Str("SYSTEM")})}, pandoc.Attr("", {"system-title"})),
+      pandoc.Div(body, pandoc.Attr("", {"system-body"})),
+    }, pandoc.Attr("", {"system-window-simple"}))
   end
 
   -- One fixed-layout table keeps decorative images out of nested auto-width
@@ -151,3 +167,9 @@ function BlockQuote(block)
     }),
   })
 end
+
+-- Read the option before walking blocks; default Lua traversal visits Meta last.
+return {
+  {Meta = Meta},
+  {RawInline = RawInline, Div = Div, HorizontalRule = HorizontalRule, BlockQuote = BlockQuote},
+}
