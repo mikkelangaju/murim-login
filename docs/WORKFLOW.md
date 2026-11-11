@@ -322,7 +322,8 @@ For system-window CSS changes, also run
 This opt-in check requires the Playwright Python package and its WebKit browser
 (`python -m playwright install --with-deps webkit`). It checks narrow screens,
 large text, light/dark panels, and the responsive-image rule that collapsed
-the old header's dragons in Apple Books.
+the old header's dragons in Apple Books. Pixel checks also verify continuous
+gold side rails and blue fill under a simulated night-mode cell-color override.
 
 ## Address Pass
 

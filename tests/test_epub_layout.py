@@ -3,6 +3,7 @@
 """
 
 import os
+from io import BytesIO
 from pathlib import Path
 import tempfile
 import unittest
@@ -14,6 +15,7 @@ from tools.build import STYLESHEET, run_pandoc, validate_epub
 @unittest.skipUnless(os.environ.get("MURIM_WEBKIT_QA") == "1", "opt-in WebKit layout QA")
 class EpubLayoutTest(unittest.TestCase):
     def test_frame_and_dragons_survive_reader_image_rules(self):
+        from PIL import Image
         from playwright.sync_api import sync_playwright
 
         with tempfile.TemporaryDirectory() as directory:
@@ -53,6 +55,10 @@ class EpubLayoutTest(unittest.TestCase):
                             "img { max-width:100%; height:auto; }"
                             f"body {{ font-size:{font_size}px; }}"
                         ))
+                        if theme == "dark":
+                            # Books' night theme can replace solid cell colors
+                            # while preserving gradient backgrounds.
+                            page.add_style_tag(content="td { background-color: #000 !important; }")
                         results = page.locator("table.system-window").evaluate_all("""tables => tables.map(t => {
                             const rect = e => e.getBoundingClientRect();
                             const frame = rect(t);
@@ -67,7 +73,7 @@ class EpubLayoutTest(unittest.TestCase):
                                     loaded: e.complete && e.naturalWidth > 0,
                                     inside: rect(e).left >= crest.left && rect(e).right <= crest.right
                                 })),
-                                fill: getComputedStyle(t.querySelector('.system-body')).backgroundColor,
+                                fill: getComputedStyle(t.querySelector('.system-body')).backgroundImage,
                                 ink: getComputedStyle(t.querySelector('.system-body p')).webkitTextFillColor,
                                 overflow: t.scrollWidth > frame.width+1
                             };
@@ -87,7 +93,22 @@ class EpubLayoutTest(unittest.TestCase):
                                 self.assertAlmostEqual(left if index % 2 == 0 else right,
                                                        result["left"] if index % 2 == 0 else result["right"], delta=1)
                             self.assertEqual(result["ink"], "rgb(255, 255, 255)")
-                            self.assertEqual(result["fill"], "rgb(23, 57, 87)" if theme == "dark" else "rgb(45, 106, 173)")
+                            expected_fill = "rgb(23, 57, 87)" if theme == "dark" else "rgb(45, 106, 173)"
+                            self.assertIn(expected_fill, result["fill"])
+                        for window in page.locator("table.system-window").all():
+                            with Image.open(BytesIO(window.screenshot())) as image:
+                                rgb = image.convert("RGB")
+                                panel = (23, 57, 87) if theme == "dark" else (45, 106, 173)
+                                # The side gutter must retain the blue fill even
+                                # when every cell's background-color is black.
+                                self.assertEqual(rgb.getpixel((12, rgb.height // 2)), panel)
+                                # Gold reaches both outer edges from the upper
+                                # corners down through the lower corners.
+                                for x in (1, rgb.width - 2):
+                                    for y in range(12, rgb.height - 1):
+                                        red, green, blue = rgb.getpixel((x, y))
+                                        self.assertGreater(red, blue)
+                                        self.assertGreater(green, blue)
                 browser.close()
 
 
