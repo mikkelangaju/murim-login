@@ -10,9 +10,11 @@ from __future__ import annotations
 import argparse
 import os
 import posixpath
+import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from zipfile import ZipFile
@@ -115,6 +117,59 @@ def run_pandoc(
     output = output.resolve()
     command.extend(["--output", str(output)])
     subprocess.run(command, cwd=output.parent, check=True)
+    if output_format == "epub3" and full_color_epub:
+        inline_epub_windows(output)
+
+
+def inline_epub_windows(path: Path) -> None:
+    """Copy the authored window class rules into self-contained zoomable tables.
+
+    This deliberately reads only the marked simple-class section, not arbitrary
+    CSS selectors or theme overrides. The same declarations style page and popup.
+    """
+    css = COLOR_STYLESHEET.read_text(encoding="utf-8")
+    section = css.split("/* BEGIN SYSTEM WINDOW INLINE", 1)[1].split("/* END SYSTEM WINDOW INLINE */", 1)[0]
+    section = section.split("*/", 1)[1]
+    section = re.sub(r"/\*.*?\*/", "", section, flags=re.S)
+    styles = {
+        name: " ".join(declarations.split())
+        for name, declarations in re.findall(r"\.(system-[\w-]+)\s*\{([^{}]*)\}", section)
+    }
+    # Keep raised note references when Books detaches a table from chapter CSS.
+    reference_style = re.search(r"\.footnote-ref\s*\{([^{}]*)\}", STYLESHEET.read_text(encoding="utf-8"))
+    styles["footnote-ref"] = " ".join(reference_style.group(1).split())
+    tag_classes = {
+        "p": "system-paragraph", "ul": "system-list", "ol": "system-list",
+        "li": "system-item", "strong": "system-emphasis", "code": "system-code",
+    }
+    ns = "{http://www.w3.org/1999/xhtml}"
+    ET.register_namespace("", ns[1:-1])
+    ET.register_namespace("epub", "http://www.idpf.org/2007/ops")
+    with tempfile.TemporaryDirectory(dir=path.parent) as directory:
+        target = Path(directory) / path.name
+        with ZipFile(path) as source, ZipFile(target, "w") as output:
+            for entry in source.infolist():
+                data = source.read(entry)
+                if entry.filename.endswith(".xhtml"):
+                    doc = ET.fromstring(data)
+                    windows = doc.findall(f".//{ns}table[@class='system-window']")
+                    for window in windows:
+                        for element in window.iter():
+                            classes = element.get("class", "").split()
+                            tag_class = tag_classes.get(element.tag.removeprefix(ns))
+                            if tag_class:
+                                classes.append(tag_class)
+                            if "system-body" in classes and len(element):
+                                last = element[-1]
+                                last.set("class", (last.get("class", "") + " system-last").strip())
+                            declarations = [styles[name] for name in classes if name in styles]
+                            if declarations:
+                                element.set("class", " ".join(classes))
+                                element.set("style", "; ".join(filter(None, [element.get("style", ""), *declarations])))
+                    if windows:
+                        data = ET.tostring(doc, encoding="utf-8", xml_declaration=True)
+                output.writestr(entry, data)
+        target.replace(path)
 
 
 def ensure_reader_dependencies(npm: str) -> None:

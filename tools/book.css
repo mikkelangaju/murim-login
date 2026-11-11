@@ -69,6 +69,16 @@ blockquote {
   padding: 0.1rem 1rem;
 }
 
+/* Pandoc emits plain noteref links in EPUB so Books can open note pop-ups.
+   Raise the links with CSS without adding nested markup to their tap targets. */
+.footnote-ref {
+  vertical-align: super;
+  font-size: 0.75em;
+  line-height: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
 .footnotes {
   border: 0;
   color: inherit;

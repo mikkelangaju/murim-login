@@ -86,86 +86,43 @@ function BlockQuote(block)
     }, pandoc.Attr("", {"system-window-simple"}))
   end
 
-  -- One fixed-layout table keeps decorative images out of nested auto-width
-  -- cells, which collapse under reader-wide img { max-width: 100% } rules.
-  local function picture(name, width, height)
-    return pandoc.Image(
-      {},
-      ornament(name),
-      "",
-      pandoc.Attr("", {name:match("^dragon") and "system-dragon" or "system-corner-art"},
-        {width = tostring(width), height = tostring(height)})
-    )
+  -- One cell preserves Books' table zoom and avoids decorative column sizing.
+  -- The entire crest is in flow, including its space above the top gold rail.
+  local function picture(name, width, height, classes)
+    return pandoc.Image({}, ornament(name), "",
+      pandoc.Attr("", classes, {width = tostring(width), height = tostring(height)}))
   end
-
-  local function cell(content, classes, colspan)
-    local blocks = content.t and {content} or content
-    return pandoc.Cell(
-      blocks,
-      pandoc.AlignCenter,
-      1,
-      colspan or 1,
-      pandoc.Attr("", classes)
-    )
+  local function div(blocks, class)
+    return pandoc.Div(blocks, pandoc.Attr("", {class}))
   end
-
-  local function plain(inlines, classes, colspan)
-    return cell(pandoc.Plain(inlines), classes, colspan)
-  end
-
-  local function blank(classes, colspan)
-    return plain({pandoc.RawInline("html", "&#160;")}, classes, colspan)
-  end
-
-  local cols = function(count)
-    local specs = {}
-    for _ = 1, count do
-      specs[#specs + 1] = {pandoc.AlignDefault, 0}
-    end
-    return specs
-  end
-
-  local function grid(classes, col_count, rows)
-    return pandoc.Table(
-      {},
-      cols(col_count),
-      pandoc.TableHead(),
-      {{attr = pandoc.Attr(), head = {}, body = rows, row_head_columns = 0}},
-      pandoc.TableFoot(),
-      pandoc.Attr("", classes)
-    )
-  end
-
-  local crest = {
-    picture("dragon.png", 24, 19),
+  local crest = div({pandoc.Plain({
+    picture("dragon.png", 24, 19, {"system-dragon"}),
     pandoc.Span(block.content[1].content, pandoc.Attr("", {"system-plaque"})),
-    picture("dragon-flip.png", 24, 19),
-  }
-
+    picture("dragon-flip.png", 24, 19, {"system-dragon"}),
+  })}, "system-crest")
+  local header = div({
+    pandoc.Plain({
+      picture("corner-tl.png", 24, 24, {"system-corner-art", "system-corner-tl"}),
+      picture("corner-tr.png", 24, 24, {"system-corner-art", "system-corner-tr"}),
+    }),
+    crest,
+  }, "system-header")
   local body = {}
-  for index = 2, #block.content do
-    body[#body + 1] = block.content[index]
-  end
-
-  return grid({"system-window"}, 5, {
-    pandoc.Row({
-      plain({picture("corner-tl.png", 24, 24)}, {"system-corner", "system-corner-top"}),
-      plain({pandoc.Span({}, pandoc.Attr("", {"system-bar"}))}, {"system-rail"}),
-      plain({pandoc.Span(crest, pandoc.Attr("", {"system-crest-content"}))}, {"system-crest"}),
-      plain({pandoc.Span({}, pandoc.Attr("", {"system-bar"}))}, {"system-rail"}),
-      plain({picture("corner-tr.png", 24, 24)}, {"system-corner", "system-corner-top"}),
-    }),
-    pandoc.Row({
-      blank({"system-edge", "system-edge-left"}),
-      cell(body, {"system-body"}, 3),
-      blank({"system-edge", "system-edge-right"}),
-    }),
-    pandoc.Row({
-      plain({picture("corner-bl.png", 24, 24)}, {"system-corner", "system-corner-bottom"}),
-      blank({"system-base"}, 3),
-      plain({picture("corner-br.png", 24, 24)}, {"system-corner", "system-corner-bottom"}),
-    }),
-  })
+  for index = 2, #block.content do body[#body + 1] = block.content[index] end
+  local footer = div({pandoc.Plain({
+    picture("corner-bl.png", 24, 24, {"system-corner-art", "system-corner-bl"}),
+    picture("corner-br.png", 24, 24, {"system-corner-art", "system-corner-br"}),
+  })}, "system-footer")
+  local content = {
+    header,
+    div({div(body, "system-body")}, "system-content"),
+    footer,
+  }
+  local cell = pandoc.Cell(content, pandoc.AlignCenter, 1, 1,
+    pandoc.Attr("", {"system-cell"}))
+  return pandoc.Table({}, {{pandoc.AlignDefault, 0}}, pandoc.TableHead(),
+    {{attr = pandoc.Attr(), head = {}, body = {pandoc.Row({cell})}, row_head_columns = 0}},
+    pandoc.TableFoot(), pandoc.Attr("", {"system-window"}))
 end
 
 -- Read the option before walking blocks; default Lua traversal visits Meta last.

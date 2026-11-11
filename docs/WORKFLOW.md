@@ -319,23 +319,43 @@ horizontal scene dividers. It contains no decorative interior images.
 
 Add `--full-color-epub` to build `build/murim-login-color.epub` with blue/gold
 system windows, transparent corner/dragon artwork, and yin-yang scene breaks.
+Each window is a single-cell table, preserving Apple Books' tap-to-enlarge
+view without decorative columns that can expand unevenly. The crest stays in
+flow inside its header, so it moves with the table at page boundaries. A
+continuous gold border extends 2px beyond the corner artwork to mask small
+alignment differences.
 The flag affects EPUB only; PDF and HTML styling are independent. Both editions
 share chapter splitting, XHTML/link validation, correct chapter-local footnotes,
-and hidden footnote divider lines. The release workflow publishes both EPUBs.
+and hidden footnote divider lines. Note references use CSS superscripts while
+retaining plain `epub:type="noteref"` links for Apple Books pop-ups. Their style
+is also inlined inside color windows for the detached enlargement view.
+The release workflow publishes both EPUBs.
 
 Full-color EPUB system-window and scene-separator PNGs are transparent renders
 of the SVG masters in
 `reader/src/ornaments/`. Regenerate them with `python tools/render_ornaments.py`
 (requires `rsvg-convert`, provided by `librsvg2-bin` on Ubuntu). Keep the alpha
-channel so reader themes show through the ornaments.
+channel so reader themes show through the ornaments. The dragon SVG canvas
+includes padding around its stroke; retain it to avoid clipping the brown
+outline in any edition.
 
 For system-window CSS changes, also run
 `MURIM_WEBKIT_QA=1 python -m unittest discover -s tests -p test_epub_layout.py`.
 This opt-in check requires the Playwright Python package and its WebKit browser
 (`python -m playwright install --with-deps webkit`). It checks narrow screens,
 large text, light/dark panels, and the responsive-image rule that collapsed
-the old header's dragons in Apple Books. Pixel checks also verify continuous
-gold side rails and blue fill under a simulated night-mode cell-color override.
+the old header's dragons in Apple Books. Pixel checks also verify
+the continuous gold lip beyond all four corners and blue fill under a simulated
+night-mode panel-color override. Additional checks move tables across CSS
+column/page boundaries and compare their rendering after extraction into a
+standalone view without chapter CSS or the table's root class. The Books tap
+interaction itself still requires an iOS device check.
+
+`tools/build.py` copies the simple class declarations in the marked inline
+section of `tools/epub-color.css` onto the generated window elements. Keep these
+rules self-contained, with literal color fallbacks; dark-mode overrides stay
+outside that section. This gives the enlargement view its own layout, colors,
+and text styling without depending on inherited chapter styles.
 
 ## Address Pass
 

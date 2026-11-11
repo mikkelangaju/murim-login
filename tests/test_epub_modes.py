@@ -58,6 +58,13 @@ class EpubModesTest(unittest.TestCase):
                             body = doc.find(f".//*[@class='system-body']")
                             text.append(" ".join("".join(body.itertext()).split()))
                             if color:
+                                window = doc.find(f".//{NS}table[@class='system-window']")
+                                self.assertIsNotNone(window)
+                                # One cell preserves Books' zoom without decorative columns.
+                                self.assertEqual(len(window.findall(f".//{NS}td")), 1)
+                                for element in window.iter():
+                                    if "system-" in element.get("class", ""):
+                                        self.assertTrue(element.get("style"))
                                 self.assertEqual(len(doc.findall(f".//{NS}img[@class='system-dragon']")), 2)
                                 self.assertEqual(len(doc.findall(f".//{NS}div[@class='scene-separator']")), 1)
                             else:

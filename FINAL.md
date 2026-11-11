@@ -28,6 +28,8 @@ Compare the English with the Korean source.
 
 Use Markdown footnotes (`[^1]`, `[^2]`, …). Number them in order of first appearance, starting at 1 for this chapter. Put every definition in one block at the end of the file.
 
+Every reference must have a definition, and every definition must be referenced. Final QA blocks unused definitions as well as missing definitions. Keep new and renumbered markers when restoring thought italics.
+
 Within this chapter, write one definition for a term, unit, amount, or reference. Every later occurrence of that same thing reuses the same marker. `goshiwon` five times is one note, and so is `hyung`. A different amount or a different term gets its own note. Another chapter may carry its own note for the same term.
 
 Write notes in factual English. No spoilers and no jokes added by the note. Romanize words. A note may include the original character when it is explaining that character. Keep Hangul jamo already used as chat reactions, such as ㅋㅋ and ㄷㄷ.

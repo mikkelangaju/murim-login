@@ -49,6 +49,13 @@ class FinalQaTest(unittest.TestCase):
         self.assertFalse(qa["passed"])
         self.assertTrue(any(item["code"] == "straight_quotes" for item in qa["errors"]))
 
+    def test_unused_footnote_definition_blocks_final_acceptance(self):
+        candidate = self.baseline + "\n[^1]: An unused explanation.\n"
+        qa = self.assess(candidate)
+        self.assertFalse(qa["passed"])
+        error = next(item for item in qa["errors"] if item["code"] == "unused_footnotes")
+        self.assertEqual(error["details"]["unused_definitions"], ["1"])
+
     def test_system_chat_and_thought_formats(self):
         good = chapter(
             "> **System**\n>\n> - You have joined.\n\n" + ("The hall was quiet. " * 8)
@@ -202,6 +209,22 @@ class FinalQaTest(unittest.TestCase):
         self.assertIn("*I’m Iron Man.*", normalized)
         self.assertNotIn("“I’m Iron Man.”", normalized)
         self.assertEqual(final_qa.missing_panel_headings(baseline, normalized), [])
+
+    def test_restoring_thoughts_preserves_new_and_renumbered_notes(self):
+        cases = (
+            ("*One shichen of sleep.*", "“One shichen[^1] of sleep.”", "*One shichen[^1] of sleep.*"),
+            ("*Add two hundred geun[^2].*", "“Add two hundred geun[^3].”", "*Add two hundred geun[^3].*"),
+            (
+                "*The Nine Provinces and the Four Seas and Five Lakes.*",
+                "“The Nine Provinces[^2] and the Four Seas and Five Lakes[^3].”",
+                "*The Nine Provinces[^2] and the Four Seas and Five Lakes[^3].*",
+            ),
+        )
+        for baseline, candidate, expected in cases:
+            with self.subTest(candidate=candidate):
+                definitions = "\n\n[^1]: Time.\n[^2]: Regions.\n[^3]: Waters.\n"
+                normalized = final_qa.normalize_reading_copy(chapter(baseline), chapter(candidate) + definitions)
+                self.assertEqual(normalized, chapter(expected) + definitions)
 
     def test_surplus_system_panel_is_removed(self):
         from tools.final_qa import normalize_reading_copy

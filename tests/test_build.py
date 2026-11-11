@@ -19,6 +19,19 @@ class BuildToolTest(unittest.TestCase):
                 self.assertEqual(image.getchannel("A").getextrema(), (0, 255))
                 self.assertGreaterEqual(image.width, 120)
 
+    def test_dragon_outline_is_not_clipped_by_the_canvas(self):
+        from PIL import Image
+
+        for name in ("dragon.png", "dragon-flip.png"):
+            with self.subTest(name=name), Image.open(READER / "src/ornaments" / name) as image:
+                bounds = image.getchannel("A").getbbox()
+                self.assertIsNotNone(bounds)
+                left, top, right, bottom = bounds
+                self.assertGreater(left, 0)
+                self.assertGreater(top, 0)
+                self.assertLess(right, image.width)
+                self.assertLess(bottom, image.height)
+
     def test_epub_scene_break_embeds_yin_yang(self):
         import posixpath
 
