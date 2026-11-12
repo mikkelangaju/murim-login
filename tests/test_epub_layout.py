@@ -129,7 +129,7 @@ class EpubLayoutTest(unittest.TestCase):
                             # Books' night theme can replace solid panel colors
                             # while preserving gradient backgrounds.
                             page.add_style_tag(content=".system-content, .system-footer, .system-plaque { background-color: #000 !important; }")
-                        results = page.locator(".system-window").evaluate_all("""windows => windows.map(t => {
+                        results = page.locator("table.system-window").evaluate_all("""windows => windows.map(t => {
                             const rect = e => e.getBoundingClientRect();
                             const frame = rect(t);
                             const corners = [...t.querySelectorAll('img.system-corner-art')].map(rect);
@@ -179,7 +179,7 @@ class EpubLayoutTest(unittest.TestCase):
                             self.assertEqual(result["ink"], "rgb(255, 255, 255)")
                             expected_fill = "rgb(23, 57, 87)" if theme == "dark" else "rgb(45, 106, 173)"
                             self.assertIn(expected_fill, result["fill"])
-                        for window in page.locator(".system-window").all():
+                        for window in page.locator("table.system-window").all():
                             crest_left = window.locator(".system-crest").evaluate(
                                 "e => e.getBoundingClientRect().left - e.closest('.system-window').getBoundingClientRect().left"
                             )
@@ -207,7 +207,7 @@ class EpubLayoutTest(unittest.TestCase):
                                         self.assertGreater(green, blue)
                 browser.close()
 
-    def test_inline_panels_retain_styles_without_chapter_stylesheet(self):
+    def test_detached_table_preserves_layout_without_chapter_stylesheet(self):
         from playwright.sync_api import sync_playwright
 
         source = ("# Chapter 0\n\n> **System**\n>\n> Points complete.\n\n"
@@ -227,8 +227,8 @@ class EpubLayoutTest(unittest.TestCase):
                     page.goto(chapter.as_uri())
                     body_style = f"margin:0;padding:0;max-width:none;font-size:{font_size}px"
                     page.locator("body").evaluate("(e,s) => e.setAttribute('style',s)", body_style)
-                    page.locator(".system-window").evaluate_all("es => document.body.replaceChildren(...es)")
-                    tables = page.locator(".system-window")
+                    page.locator("table.system-window").evaluate_all("es => document.body.replaceChildren(...es)")
+                    tables = page.locator("table.system-window")
                     baseline = [table.screenshot() for table in tables.all()]
                     # Isolate the table as a zoom web view may do: no linked CSS,
                     # no ancestor theme or custom properties, no table root class.
@@ -241,120 +241,20 @@ class EpubLayoutTest(unittest.TestCase):
                     # including leaf spans/emphasis and backgrounds, in both modes.
                     page.add_style_tag(content=(
                         "body * {color:#000 !important;-webkit-text-fill-color:#000 !important;"
-                        "color-scheme:light !important;font-family:Arial,sans-serif !important;}"
-                        "[data-system-window],.system-cell,.system-header,.system-content,.system-footer,.system-plaque {"
+                        "color-scheme:light !important;}"
+                        "table,td,.system-header,.system-content,.system-footer,.system-plaque {"
                         "background-color:#eee !important;background-image:none !important;}"
                     ))
-                    for index, table in enumerate(page.locator("[data-system-window]").all()):
+                    for index, table in enumerate(page.locator("table").all()):
                         self.assertEqual(table.screenshot(), baseline[index])
-                        self.assertEqual(table.locator(".system-cell").count(), 1)
+                        self.assertEqual(table.locator("td").count(), 1)
                         self.assertEqual(table.locator(".system-dragon").count(), 2)
                         colors = table.locator("p,strong,em,span,code,a,li").evaluate_all("""es => es.map(e => ({
-                            ink:getComputedStyle(e).color, fill:getComputedStyle(e).webkitTextFillColor,
-                            font:getComputedStyle(e).fontFamily
+                            ink:getComputedStyle(e).color, fill:getComputedStyle(e).webkitTextFillColor
                         }))""")
                         for color in colors:
                             self.assertEqual(color["ink"], "rgb(255, 255, 255)")
                             self.assertEqual(color["fill"], "rgb(255, 255, 255)")
-                            self.assertIn("Georgia", color["font"])
-            browser.close()
-
-    def test_enlarge_link_opens_authored_document_with_local_notes(self):
-        from playwright.sync_api import sync_playwright
-
-        source = ("# Chapter 0\n\nBefore[^1].\n\n> **System**\n>\n"
-                  "> Player detected. This is a test window[^2].\n\n"
-                  "[^1]: Outside note.\n\n[^2]: Window note.\n")
-        with color_chapter(source) as chapter, sync_playwright() as playwright:
-            browser = playwright.webkit.launch()
-            page = browser.new_page(viewport={"width": 390, "height": 844})
-            for theme in ("light", "dark"):
-                with self.subTest(theme=theme):
-                    page.emulate_media(color_scheme=theme)
-                    page.goto(chapter.as_uri())
-                    self.assertEqual(page.locator("table.system-window").count(), 0)
-                    panel = page.locator(".system-window")
-                    # Isolate the panel and compare typography across the link;
-                    # the enlargement intentionally uses different margins.
-                    panel.evaluate("e => document.body.replaceChildren(e)")
-                    text_style = """e => {
-                        const s=getComputedStyle(e);
-                        return {font:s.fontFamily,size:s.fontSize,ink:s.color,fill:s.webkitTextFillColor};
-                    }"""
-                    baseline = panel.locator(".system-body p").evaluate(text_style)
-                    # Footnotes must remain tappable above the panel's open link.
-                    self.assertTrue(page.locator("a.footnote-ref").evaluate("""e => {
-                        const r=e.getBoundingClientRect();
-                        return document.elementFromPoint(r.left+r.width/2,r.top+r.height/2) === e;
-                    }"""))
-                    page.locator("a.system-open").click(position={"x": 5, "y": 10})
-                    self.assertIn("window-ch001-1.xhtml", page.url)
-                    self.assertEqual(page.title(), "System — Chapter 0")
-                    self.assertEqual(page.locator(".system-window .system-body p").evaluate(text_style), baseline)
-                    self.assertTrue(page.locator(".system-window").evaluate("e => e.getBoundingClientRect().right <= innerWidth"))
-                    self.assertEqual(page.locator("a.system-open").count(), 0)
-                    self.assertEqual(page.locator("table").count(), 0)
-                    note = page.locator(".system-window a.footnote-ref")
-                    target = note.get_attribute("href")
-                    self.assertTrue(target.startswith("#"))
-                    self.assertIn("Window note.", page.locator(target).inner_text())
-                    self.assertNotIn("Outside note.", page.locator("body").inner_text())
-                    page.get_by_role("link", name="Return to chapter").click()
-                    self.assertIn("ch001.xhtml#system-window-1", page.url)
-            browser.close()
-
-    def test_popup_fits_phone_width_including_a_wider_reader_canvas(self):
-        from playwright.sync_api import sync_playwright
-
-        source = ("# Chapter 0\n\n> **System**\n>\n> "
-                  + ("A long system message that should reflow vertically. " * 40)
-                  + "\n>\n> - " + "LongQuestIdentifier" * 12 + "\n")
-        with color_chapter(source) as chapter, sync_playwright() as playwright:
-            browser = playwright.webkit.launch()
-            popup = chapter.with_name("window-ch001-1.xhtml")
-            for width in (320, 390, 430):
-                context = browser.new_context(is_mobile=True, viewport={"width": width, "height": 844},
-                                              screen={"width": width, "height": 844})
-                page = context.new_page()
-                for font_size in (16, 32):
-                    with self.subTest(width=width, font_size=font_size):
-                        page.goto(popup.as_uri())
-                        page.add_style_tag(content=f"body {{font-size:{font_size}px;}}"
-                                                  f".system-plaque {{font-size:{font_size}px !important;}}")
-                        result = page.locator(".system-window").evaluate("""e => {
-                            const r=e.getBoundingClientRect();
-                            return {left:r.left,right:r.right,height:r.height,
-                                overflow:document.documentElement.scrollWidth > innerWidth,
-                                viewport:document.querySelector('meta[name=viewport]').content};
-                        }""")
-                        self.assertGreaterEqual(result["left"], 0)
-                        self.assertLessEqual(result["right"], width)
-                        self.assertGreater(result["height"], 844)
-                        self.assertFalse(result["overflow"])
-                        self.assertIn("user-scalable=yes", result["viewport"])
-                        self.assertNotIn("maximum-scale", result["viewport"])
-                context.close()
-            # Model a Books overlay that lays out a desktop-size canvas inside
-            # a phone-size screen, ignoring the initial device-width metadata.
-            context = browser.new_context(viewport={"width": 980, "height": 844},
-                                          screen={"width": 390, "height": 844})
-            page = context.new_page()
-            page.goto(popup.as_uri())
-            result = page.locator(".system-window").evaluate("""e => {
-                return {fraction:e.getBoundingClientRect().width/innerWidth,
-                    overflow:document.documentElement.scrollWidth > innerWidth,
-                    visibleFont:parseFloat(getComputedStyle(e.querySelector('p')).fontSize)*screen.width/innerWidth,
-                    visibleDragon:e.querySelector('.system-dragon').getBoundingClientRect().width*screen.width/innerWidth};
-            }""")
-            # A 390px panel inside a 980px canvas appears postage-stamp size
-            # after the host scales the canvas to the phone. Test visual size.
-            self.assertGreater(result["fraction"], 0.9)
-            self.assertFalse(result["overflow"])
-            self.assertGreaterEqual(result["visibleFont"], 14)
-            self.assertAlmostEqual(result["visibleDragon"], 24, delta=0.1)
-            page.set_viewport_size({"width": 320, "height": 844})
-            self.assertEqual(page.locator("html").evaluate("e => e.getBoundingClientRect().width"), 320)
-            context.close()
             browser.close()
 
     def test_footnote_references_are_raised_without_changing_line_height(self):
@@ -394,7 +294,7 @@ class EpubLayoutTest(unittest.TestCase):
                                     align:style.verticalAlign, raised:r.top+r.height/2 < b.top+b.height/2,
                                     height,without,target:!!document.getElementById(e.hash.slice(1)),
                                     nested:e.children.length,inline:e.getAttribute('style'),
-                                    inWindow:!!e.closest('.system-window')};
+                                    inWindow:!!e.closest('table.system-window')};
                             })""")
                             self.assertEqual(len(references), 2)
                             for reference in references:
@@ -432,9 +332,9 @@ class EpubLayoutTest(unittest.TestCase):
                         page.locator("section.level1").evaluate("""(section, height) => {
                             const spacer=document.createElement('div');
                             spacer.style.height=height+'px';
-                            section.insertBefore(spacer,section.querySelector('.system-window'));
+                            section.insertBefore(spacer,section.querySelector('table'));
                         }""", 650 - remaining)
-                        result = page.locator(".system-window").evaluate("""table => {
+                        result = page.locator("table.system-window").evaluate("""table => {
                             const r=table.getBoundingClientRect();
                             const header=table.querySelector('.system-header').getBoundingClientRect();
                             return {left:r.left,top:r.top,bottom:r.bottom,parts:table.getClientRects().length,

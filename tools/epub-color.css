@@ -18,20 +18,21 @@ img.scene-separator-art {
 }
 
 /* BEGIN SYSTEM WINDOW INLINE
-   build.py copies these simple class rules onto each panel's elements.
-   Enlargements are separate nonlinear documents, not Books' table viewer.
+   build.py copies these simple class rules onto each table's elements. Books'
+   enlargement view can then render the table without the chapter stylesheet.
    Keep both palettes inline, with literal fallbacks for older reading engines. */
 .system-window {
-  display: block;
-  position: relative;
   width: 92%;
   margin: 1.8em auto 1.4em;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
   border: 0;
   padding: 0;
   background: transparent !important;
   color: #ffffff;
   -webkit-text-fill-color: #ffffff;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Helvetica, Arial, sans-serif;
   font-size: 0.92em;
   font-style: normal;
   font-weight: bold;
@@ -43,7 +44,6 @@ img.scene-separator-art {
 }
 
 .system-cell {
-  display: block;
   padding: 0;
   border: 0;
   background: transparent !important;
@@ -122,7 +122,7 @@ img.scene-separator-art {
   border: 1px solid #e6c86a;
   color: #ffffff;
   -webkit-text-fill-color: #ffffff;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Helvetica, Arial, sans-serif;
   font-size: 10px;
   font-weight: bold;
   letter-spacing: 0.16em;
@@ -195,9 +195,7 @@ img.scene-separator-art {
   margin: 0.45em 0;
   color: #ffffff;
   -webkit-text-fill-color: #ffffff;
-  font-family: Georgia, "Times New Roman", serif;
-  -webkit-hyphens: auto;
-  hyphens: auto;
+  font-family: Helvetica, Arial, sans-serif;
   font-weight: bold;
 }
 
@@ -229,36 +227,18 @@ img.scene-separator-art {
 }
 
 .system-code {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Helvetica, Arial, sans-serif;
   color: #ffffff;
   -webkit-text-fill-color: #ffffff;
   font-weight: bold;
 }
 
 .system-last { margin-bottom: 0; }
-.system-open {
-  display: block;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 1;
-  background: transparent !important;
-  cursor: zoom-in;
-}
 /* Applied inline to every window descendant, including em/span/a elements
-   which Books may restyle directly rather than letting them inherit. Keep
-   the same serif face in the chapter and the independent enlargement view. */
+   which Books may recolor directly rather than letting them inherit. */
 .system-ink {
   color-scheme: light dark !important;
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
-  font-family: Georgia, "Times New Roman", serif !important;
 }
 /* END SYSTEM WINDOW INLINE */
-
-.system-open:focus-visible {
-  outline: 2px solid #e6c86a;
-  outline-offset: 3px;
-}

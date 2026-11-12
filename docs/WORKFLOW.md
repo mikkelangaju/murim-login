@@ -319,22 +319,16 @@ horizontal scene dividers. It contains no decorative interior images.
 
 Add `--full-color-epub` to build `build/murim-login-color.epub` with blue/gold
 system windows, transparent corner/dragon artwork, and yin-yang scene breaks.
-Each window is a styled block linked to a separate XHTML document registered
-in the EPUB spine with `linear="no"`. Apple Books opens these nonlinear links
-in a separate pan-and-zoom window, retaining the authored document rather than
-using its native table viewer, which replaces text colors with theme colors.
-The full panel is the open link's tap target; footnote links remain above it
-and retain their own tap behavior. Readers without popup support can follow
-the same link as a normal document and use its return-to-chapter link.
-The crest stays in flow inside its header, so it moves with the panel at page boundaries. A
+Each window is a single-cell table, preserving Apple Books' tap-to-enlarge
+view without decorative columns that can expand unevenly. The crest stays in
+flow inside its header, so it moves with the table at page boundaries. A
 continuous gold border extends 2px beyond the corner artwork to mask small
 alignment differences.
 The flag affects EPUB only; PDF and HTML styling are independent. Both editions
 share chapter splitting, XHTML/link validation, correct chapter-local footnotes,
 and hidden footnote divider lines. Note references use CSS superscripts while
 retaining plain `epub:type="noteref"` links for Apple Books pop-ups. Their style
-is also inlined inside color windows. Each enlargement contains a copy of its
-referenced notes, and references outside it return to the source chapter.
+is also inlined inside color windows for the detached enlargement view.
 The release workflow publishes both EPUBs.
 
 Full-color EPUB system-window and scene-separator PNGs are transparent renders
@@ -352,48 +346,23 @@ This opt-in check requires the Playwright Python package and its WebKit browser
 large text, light/dark panels, and the responsive-image rule that collapsed
 the old header's dragons in Apple Books. Pixel checks also verify
 the continuous gold lip beyond all four corners and blue fill under a simulated
-night-mode panel-color override. Additional checks move panels across CSS
-column/page boundaries, compare inline styling without chapter CSS, and follow
-the actual enlargement links in both themes. The linked-document check compares
-typography and verifies footnote hit targets, copied notes, and return
-links. Export tests verify manifest/spine registration, text preservation, and
-that no system panel invokes the native table viewer. The Books overlay itself
-still requires an iOS device check.
+night-mode panel-color override. Additional checks move tables across CSS
+column/page boundaries and compare their rendering after extraction into a
+standalone view without chapter CSS or the table's root class, in both light
+and dark mode. The detached checks also inject competing theme colors for text
+and panel backgrounds. The Books tap interaction itself still requires an iOS
+device check.
 
 `tools/build.py` copies the simple class declarations in the marked inline
 section of `tools/epub-color.css` onto the generated window elements. Keep these
 rules self-contained. Both palettes use inline `light-dark()` colors, with
-literal blue fallbacks for older reading engines. Enlargement documents also
-embed the complete book stylesheet and carry their own language, title, and
-viewport. Their elements declare `color-scheme: light dark`.
-Popup-only CSS resets print-page sizing and book margins, fills the available
-width, and reflows long list items. A small inline script compares the reader
-canvas width to the screen width, including after a resize. When Books scales
-a wide canvas down to the screen, the popup compensates its root font and
-pixel-sized ornaments by that ratio. The panel still fills the canvas; capping
-it to the screen width would shrink it a second time in the displayed view.
-Popup manifest items declare `properties="scripted"`; chapter documents do not
-run scripts for these panels. The popup uses Apple's own light/dark canvas.
-An on-device theme diagnostic showed transparent HTML and body backgrounds
-and an unavailable Books theme value in the chapter, even with a visible beige
-reading-page background. Both chapter and popup JavaScript ran, but the
-chapter had no opaque page color to pass. Exact reading-theme background
-matching is therefore unavailable through the tested DOM color handoff.
-Native popup controls also remain under Apple's control.
-Ordinary mobile viewport/CSS layout still works in readers
-that disable scripts. Pinch zoom remains enabled; the script does not listen
-to visual-viewport zoom changes or impose a maximum scale.
+literal blue fallbacks for older reading engines, so the enlargement view does
+not depend on chapter media rules. Its elements declare `color-scheme: light dark`.
 Panel backgrounds and white text use inline `!important` declarations to resist
 reader theme overrides, and every descendant receives the white text guard,
-including emphasis, spans, and links. Every non-image element, from the panel
-to each text leaf, also carries Apple's `ibooks-dark-theme-use-custom-text-color`
-class. Each panel carries its own English language tag for hyphenation.
-Window text uses an inline Georgia/Times serif font guard so the
-enlargement does not fall back to Helvetica while the chapter uses a serif
-face. The title plaque and header grow with enlarged text. Surrounding chapter
-text keeps the reader's selected colors and fonts. These guards do not replace
-an iOS check: Apple Books can apply changes outside the normal author CSS
-cascade, and desktop WebKit does not reproduce its nonlinear overlay interface.
+including emphasis, spans, and links. The cell also carries Apple's
+`ibooks-dark-theme-use-custom-text-color` class. Surrounding chapter text keeps
+the reader's selected colors.
 
 ## Address Pass
 

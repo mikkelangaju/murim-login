@@ -7,7 +7,6 @@ on:
       - "translations/**"
       - "tools/build.py"
       - "tools/*.css"
-      - "tools/epub-popup.js"
       - "tools/system-window.lua"
       - "tools/*.typ"
       - "tools/fonts/**"
