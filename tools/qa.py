@@ -7,7 +7,7 @@ import re
 
 ATX_HEADING = re.compile(r"^(?:>\s*)*#{1,6}\s+\S")
 HANGUL = re.compile(r"[가-힣]")
-FOOTNOTE_REF = re.compile(r"\[\^([^\]]+)\](?!:)")
+FOOTNOTE_REF = re.compile(r"\[\^([^\]]+)\]")
 FOOTNOTE_DEF = re.compile(r"^>?\s*\[\^([^\]]+)\]:", re.MULTILINE)
 SYSTEM_RANK_FIELD = re.compile(r"^>\s*\*\*Rank:\*\*", re.MULTILINE)
 SKILL_REDISTRIBUTE_OBJECTIVE = re.compile(
@@ -60,7 +60,9 @@ def run_qa(number: int, source: str, translation: str, glossary: list[tuple[str,
     target_breaks = translation.count("* * *")
     if source_breaks != target_breaks:
         errors.append(finding("scene_breaks", "scene-break count differs", source=source_breaks, target=target_breaks))
-    refs = set(FOOTNOTE_REF.findall(translation))
+    # Only a line-start definition label is excluded; prose may legitimately
+    # put a colon immediately after a reference, as in "Donguibogam[^2]:".
+    refs = set(FOOTNOTE_REF.findall(FOOTNOTE_DEF.sub("", translation)))
     definitions = set(FOOTNOTE_DEF.findall(translation))
     missing_definitions = sorted(refs - definitions)
     unused_definitions = sorted(definitions - refs)

@@ -13,12 +13,13 @@ class TranslationFormatTest(unittest.TestCase):
             self.assertNotIn("...", text, path.name)
             self.assertIsNone(re.search(r"…\.(?!\.)", text), path.name)
 
-    def test_every_footnote_reference_has_a_definition(self):
+    def test_footnote_references_and_definitions_match(self):
         for path in sorted(TRANSLATIONS.glob("[0-9][0-9][0-9][0-9].md")):
             text = path.read_text(encoding="utf-8")
-            references = set(re.findall(r"\[\^(\d+)\](?!:)", text))
+            body = re.sub(r"^\[\^\d+\]:", "", text, flags=re.M)
+            references = set(re.findall(r"\[\^(\d+)\]", body))
             definitions = set(re.findall(r"^\[\^(\d+)\]:", text, re.M))
-            self.assertLessEqual(references, definitions, path.name)
+            self.assertEqual(references, definitions, path.name)
 
 
 if __name__ == "__main__":

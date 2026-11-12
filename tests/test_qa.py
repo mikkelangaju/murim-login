@@ -4,6 +4,18 @@ from tools.qa import run_qa
 
 
 class QaTest(unittest.TestCase):
+    def test_reference_before_colon_is_not_an_unused_definition(self):
+        text = "# Chapter 1\n\nHe opened the book[^1]: a medical encyclopedia.\n\n[^1]: A historical work.\n"
+        result = run_qa(1, "가" * 50, text, [])
+        findings = result["errors"] + result["warnings"]
+        self.assertFalse(any(item["code"] in {"footnotes", "unused_footnotes"} for item in findings))
+
+    def test_definitions_do_not_count_as_their_own_references(self):
+        text = "# Chapter 1\n\nThe hall was quiet.\n\n[^1]: An unused explanation.\n"
+        result = run_qa(1, "가" * 30, text, [])
+        warning = next(item for item in result["warnings"] if item["code"] == "unused_footnotes")
+        self.assertEqual(warning["details"]["unused_definitions"], ["1"])
+
     def test_clean_copy_passes(self):
         source = "＃1화\n\n" + ("그는 말했다. " * 9) + "\n\n* * *\n\n100"
         target = '# Chapter 1\n\nHe said, “This is deliberately long enough to pass the translation ratio check.”\n\n* * *\n\n100 remained.\n'

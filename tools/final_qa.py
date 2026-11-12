@@ -288,20 +288,20 @@ def _thought_key(line: str) -> str:
 
 
 def _restore_thoughts(baseline: str, lines: list[str]) -> list[str]:
-    """A thought the mastered copy set in italics stays a thought, not speech."""
-    thoughts: dict[str, str] = {}
+    """Restore thought italics without reverting the candidate's note markers."""
+    thoughts: set[str] = set()
     for line in baseline.splitlines():
         stripped = line.strip()
         if stripped.startswith("*") and stripped.endswith("*") and not stripped.startswith("**"):
             if stripped == "* * *":
                 continue
-            thoughts[_thought_key(stripped)] = stripped
+            thoughts.add(_thought_key(stripped))
     restored: list[str] = []
     for line in lines:
         stripped = line.strip()
         key = _thought_key(stripped)
         if stripped.startswith("“") and stripped.endswith("”") and key in thoughts:
-            restored.append(thoughts[key])
+            restored.append("*" + stripped[1:-1] + "*")
         else:
             restored.append(line)
     return restored
@@ -422,7 +422,12 @@ def assess(
     errors: list[dict] = []
     # The substring-based terminology warning is noise here (진태 inside 진태경,
     # 상태 inside 상태창); the precise proper-name check below replaces it.
-    warnings = [item for item in qa.get("warnings") or [] if item.get("code") != "terminology"]
+    warnings = []
+    for item in qa.get("warnings") or []:
+        if item.get("code") == "unused_footnotes":
+            errors.append(item)
+        elif item.get("code") != "terminology":
+            warnings.append(item)
     names = check_names(source, candidate, name_entries)
     warnings.extend(names["warnings"])
     for error in qa.get("errors") or []:
