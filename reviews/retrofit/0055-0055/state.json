@@ -1,0 +1,29 @@
+{
+  "blocks": [
+    {
+      "chapters": [
+        55
+      ],
+      "end": 55,
+      "packet": "packet-0055-0055.md",
+      "packet_sha256": "511322a9c0faf5f18dc3a0d6bb914244a024ef9d002df413fd1f0eeeeb233a0c",
+      "packet_token_estimate": 11407,
+      "start": 55
+    }
+  ],
+  "changed_chapters": [],
+  "initial": {
+    "55": {
+      "source_sha256": "e592d85223554c50d732a0eab5cfcb8f7a8af14b0f0865fe315eabaf5d1c7193",
+      "translation_sha256": "9e1d4652d4e06222d94784dab1f1fa5717a2d5c7a2062bac44c0d12ddf8e9c87"
+    }
+  },
+  "normal_workflow_untouched": true,
+  "range": [
+    55,
+    55
+  ],
+  "review_packet_token_estimate": 11407,
+  "stage": "PREPARED",
+  "version": 1
+}
