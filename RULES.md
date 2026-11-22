@@ -13,6 +13,7 @@
 ## Terminology
 
 - `compendium.md` and `docs/NAMES.md` are binding for established names, titles, ranks, techniques, organizations, system terms, items, and locations. Profile headings and aliases join that ledger.
+- Use **Mount Hua Sect** for the organization (`화산파`, also shortened to `화산` in Korean) and **Mount Hua** for the mountain. Follow the glossary for individual epithets.
 - Search only exact Korean terms already present in the current chapter; the compendium contains future-sensitive entries.
 - Never re-romanize established names or invent grand names for uncertain terms. First use of an unlisted name or title almost always needs a footnote or a mapped ledger term.
 - Use `qi` for Murim energy and `mana` for the modern Hunter system when the source distinguishes them. Preserve an established chapter-specific rendering such as `internal energy` when the exact glossary and surrounding Korean distinguish accumulated `공력` from resulting `기운`.

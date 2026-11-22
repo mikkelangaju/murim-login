@@ -6,5 +6,5 @@
 - **Role:** Elder of the Zhongnan Sect, known as the Roaring Fury Swordsman and one of Sect Leader Gong Iljung’s two Senior Brothers.
 - **Personality:** Arrogant and domineering, but capable of remorse over choices that harmed his sect and those he failed to protect.
 - **Voice:** Gruff, cutting, condescending, and threatening, with formal authority used to pressure those beneath him.
-- **Relationships:** Gong Iljung is his junior Sect Leader and martial younger brother; Gong Ilhyuk is a junior Disciple of his sect; he recognizes Baek Museong and Cheongpung through their Huashan and Sword Saint connections.
+- **Relationships:** Gong Iljung is his junior Sect Leader and martial younger brother; Gong Ilhyuk is a junior Disciple of his sect; he recognizes Baek Museong and Cheongpung through their Mount Hua Sect and Sword Saint connections.
 - **Sources:** Korean source and accepted translation, Chapter 191

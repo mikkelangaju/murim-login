@@ -253,7 +253,7 @@ use. First use of an unlisted name or title almost always needs a footnote.
 | 석칠 | **Seokchil** | Middle-aged porter with nearly twenty years of experience. |
 | 성운표국 | **Seongun Escort Bureau** | Escort Bureau in southern Shanxi Province. |
 | 송 표두 | **Escort Chief Song** | Unnamed person responsible for the escort run. |
-| 연화봉 | **Lotus Peak** | Peak on Huashan from which Cheongpung recently fled. |
+| 연화봉 | **Lotus Peak** | Peak on Mount Hua from which Cheongpung recently fled. |
 | 빙당호로 | **candied hawthorn skewers** | Traditional fruit skewers coated in hardened sugar; explained in a footnote. |
 | 하북 | **Hebei** | Province where Hyuk Family Textile Shop has a branch. |
 | 혁가 포목점 | **Hyuk Family Textile Shop** | Taiyuan textile shop owned by Hyuk Mujin's parents; the largest in Taiyuan, with branches in Henan and Hebei. |
@@ -297,7 +297,7 @@ use. First use of an unlisted name or title almost always needs a footnote.
 | 아파야 무인이다 | **You Must Hurt to Become a Martial Artist** | Wuxia novel title read by Hyuk Mujin. |
 | 무림의 아들 걸어서 구주팔황 세 바퀴 반 | **The Son of Murim Walks Three and a Half Rounds Around the Nine Provinces and Eight Wastes** | Wuxia novel title read by Hyuk Mujin. |
 | 구주팔황 | **Nine Provinces and Eight Wastes** | Literary geographic phrase appearing in a wuxia novel title. |
-| 이풍 | **Li Feng** | Shanxi Province's Assistant Military Commissioner; former Huashan lay disciple |
+| 이풍 | **Li Feng** | Shanxi Province's Assistant Military Commissioner; former Mount Hua Sect lay disciple |
 | 이 첨사 | **Assistant Commissioner Li** | Address form for Li Feng |
 | 홍 내관 | **Eunuch Hong** | Eunuch and Deputy Military Commissioner of Shanxi Province |
 | 도지휘동지 | **Deputy Military Commissioner** | Second-rank military office held by Eunuch Hong |
@@ -309,13 +309,13 @@ use. First use of an unlisted name or title almost always needs a footnote.
 | 철혈문 | **Iron Blood Sect** | Henan sect mentioned by Gong Ilhyuk. |
 | 오호검문 | **Five Tigers Sword Sect** | Henan sect mentioned by Gong Ilhyuk. |
 | 태을미리장 | **Taeeul Miri Palm** | Palm technique taught to Cheongpung by Mae Jonghak. |
-| 육합검 | **Six Harmonies Sword** | Huashan sword technique known by Cheongpung. |
-| 매화검법 | **Plum Blossom Sword Technique** | Huashan sword technique Cheongpung performed at age ten. |
-| 상청검 | **Supreme Clarity Sword** | Huashan sword technique listed among Cheongpung's knowledge. |
-| 낙화추영장 | **Falling Flower Chasing Shadow Palm** | Huashan palm technique listed among Cheongpung's knowledge. |
-| 산화무영수 | **Scattering Flowers Shadowless Hand** | Huashan hand technique listed among Cheongpung's knowledge. |
-| 자하신공 | **Zaha Divine Technique** | Huashan internal-energy technique used by Cheongpung. |
-| 태사부 | **Grandmaster** | Huashan title referring to Mae Jonghak. |
+| 육합검 | **Six Harmonies Sword** | Mount Hua Sect sword technique known by Cheongpung. |
+| 매화검법 | **Plum Blossom Sword Technique** | Mount Hua Sect sword technique Cheongpung performed at age ten. |
+| 상청검 | **Supreme Clarity Sword** | Mount Hua Sect sword technique listed among Cheongpung's knowledge. |
+| 낙화추영장 | **Falling Flower Chasing Shadow Palm** | Mount Hua Sect palm technique listed among Cheongpung's knowledge. |
+| 산화무영수 | **Scattering Flowers Shadowless Hand** | Mount Hua Sect hand technique listed among Cheongpung's knowledge. |
+| 자하신공 | **Zaha Divine Technique** | Mount Hua Sect internal-energy technique used by Cheongpung. |
+| 태사부 | **Grandmaster** | Mount Hua Sect title referring to Mae Jonghak. |
 | 군림 | **The Reign** | Opening fragment of an incomplete wuxia novel title that Taekyung read through volume thirty-four. |
 | 주표 | **Zhu Bao** | Personal name of Prince Shangshan. |
 | 근위대 | **royal guard** | Guard unit protecting Prince Shangshan. |
@@ -342,12 +342,12 @@ use. First use of an unlisted name or title almost always needs a footnote.
 | 비무행 | **dueling tour** | Cheongpung's planned journey to challenge the Ten Dragons and Phoenixes. |
 | 청강검 | **blue-steel sword** | Cheongpung's sword. |
 | 광염 | **light-flames** | Violet manifestation surrounding Cheongpung when he uses the Zaha Divine Technique. |
-| 서안 | **Xi’an** | Historic city near Huashan. |
-| 서악 | **Western Peak** | Name for Huashan among the Five Great Mountains. |
+| 서안 | **Xi’an** | Historic city near Mount Hua. |
+| 서악 | **Western Peak** | Name for Mount Hua among the Five Great Mountains. |
 | 흑사파 | **Black Serpent Sect** | Dark-path gambling-den gang in Xi’an. |
-| 화산일학 | **Huashan’s Lone Crane** | Epithet of Baek Museong. |
+| 화산일학 | **Mount Hua’s Lone Crane** | Epithet of Baek Museong. |
 | 매화삼절 | **Three Plum Blossom Elites** | Collective title for the current Sect Leader’s three exceptional disciples. |
-| 매화검수 | **Plum Blossom Swordsmen** | Huashan appointment held by its three elite disciples. |
+| 매화검수 | **Plum Blossom Swordsmen** | Mount Hua Sect appointment held by its three elite disciples. |
 | 검신 | **Sword God** | Alternate title used for Mae Jonghak; kept distinct from 검성, rendered Sword Saint. |
 | 기해 | **qi sea** | Name for the dantian, the place where internal energy begins and gathers. |
 | 임독양맥 | **Conception and Governor Vessels** | The paired vessels Taekyung attempts to open. |
@@ -366,7 +366,7 @@ use. First use of an unlisted name or title almost always needs a footnote.
 | 강시 | **jiangshi** | Reanimated corpse from folklore; Childeuk and Hong mistakenly identify Taekyung as one. |
 | 태초 마을 | **Taecho Village** | Place named by Taekyung immediately after surviving the fall. |
 | 벽호공 | **Wall Lizard Technique** | Climbing martial art used to scale walls and cliffs. |
-| 낙안봉 | **Falling Goose Peak** | Huashan peak exceeding five hundred jang; Cheongpung climbed it as a child. |
+| 낙안봉 | **Falling Goose Peak** | Mount Hua peak exceeding five hundred jang; Cheongpung climbed it as a child. |
 | 인피면구 | **human-skin mask** | Disguise made from peeled human facial skin. |
 | 무재 | **martial talent** | Innate aptitude for learning martial arts. |
 | 검성 수련 간접 체험기 | **Sword Saint Training: A Secondhand Experience** | Cheongpung's Peak-grade cliff-training Quest. |
@@ -379,12 +379,12 @@ use. First use of an unlisted name or title almost always needs a footnote.
 | 내당주 | **Inner Hall Master** | Title for the head of the Jin Family's Inner Hall. |
 | 내외당 | **Inner and Outer Halls** | The Jin Family's two internal administrative divisions. |
 | 세가 | **great family** | Murim category Jin Wikyung hopes the Jin Family will attain. |
-| 복호권 | **Crouching Tiger Fist** | Huashan martial art Cheongpung uses during the spar. |
+| 복호권 | **Crouching Tiger Fist** | Mount Hua Sect martial art Cheongpung uses during the spar. |
 | 암향표 | **Dark Fragrance Drift** | Movement technique Cheongpung uses to evade Taekyung's attacks. |
 | 천근추 | **Thousand-Catty Drop** | Technique Cheongpung identifies when Taekyung lifts the spear shaft beneath his foot. |
 | 일권복호 | **One Fist Subdues the Tiger** | Named form of the Crouching Tiger Fist. |
-| 매화권 | **Plum Blossom Fist** | Huashan fist technique Cheongpung uses in sparring. |
-| 천응조 | **Heavenly Eagle Claw** | Huashan claw technique used by Cheongpung. |
+| 매화권 | **Plum Blossom Fist** | Mount Hua Sect fist technique Cheongpung uses in sparring. |
+| 천응조 | **Heavenly Eagle Claw** | Mount Hua Sect claw technique used by Cheongpung. |
 | 봉미혈 | **Fengwei acupoint** | Acupoint around the ribs targeted by Cheongpung. |
 | 태권도 | **Taekwondo** | Martial art Taekyung practiced as a child. |
 | 태극 1장부터 8장까지 | **Taegeuk Forms 1 through 8** | Standard taekwondo pattern sequence Taekyung copied as a child. |
@@ -429,7 +429,7 @@ use. First use of an unlisted name or title almost always needs a footnote.
 | 오십 년 묵은 하수오 | **Fifty-Year-Old He Shou Wu** | First Rate Spirit Herb shown in the System Item Window; can provide up to about two years of internal energy. |
 | 불로초 | **Herb of Eternal Youth** | Spirit herb said to grant eternal youth and immortality. |
 | 불로초를 찾아서 | **In Search of the Herb of Eternal Youth** | System Quest generated after Jang Taebo names the Herb of Eternal Youth. |
-| 천검진인 | **Heavenly Sword True Person** | Taoist-style title of the current Sect Leader of Huashan, who once commissioned a sword from Jang Taebo. |
+| 천검진인 | **Heavenly Sword True Person** | Taoist-style title of the current Sect Leader of the Mount Hua Sect, who once commissioned a sword from Jang Taebo. |
 | 여의주 | **dragon pearl** | Legendary treasure requested by Jang Taebo. |
 | 공청석유, 용의 발톱, 여의주 구하기 | **Get Gongcheong Seokyu, a Dragon’s Claw, and a Dragon Pearl** | Quest generated after Jang Taebo makes additional demands; Taekyung rejects it. |
 | 천풍 | **Heavenly Wind** | Short form displayed on the Heavenly Wind Band's flag. |
@@ -468,14 +468,14 @@ use. First use of an unlisted name or title almost always needs a footnote.
 | 산서기협 | **Shanxi Extraordinary Hero** | Epithet mentioned among the Jin Family’s known figures; distinct source spelling from 산서괴협. |
 | 소림사 | **Shaolin Temple** | Temple invoked in Chulwoo’s comparison of Baek Museong’s conduct. |
 | 화검봉 | **Flower Sword Phoenix** | Eunhyang’s epithet and one of the Three Plum Blossom Elites. |
-| 화산말학 | **Huashan’s Last Crane** | Taekyung’s mistaken hearing of 화산일학; not a genuine epithet. |
+| 화산말학 | **Mount Hua’s Last Crane** | Taekyung’s mistaken hearing of 화산일학; not a genuine epithet. |
 | 매화손절 | **Plum Blossom Cutoff** | Taekyung’s mistaken hearing of 매화삼절; not a genuine title. |
 | 하곡문 | **Hequ Sect** | Small sect led by Jang Se-pal. |
 | 장세팔 | **Jang Se-pal** | Leader of the small Hequ Sect. |
 | 양천 | **Yangcheon** | Shanxi-area location near which a small martial arts academy operates. |
 | 노호검객 | **Roaring Fury Swordsman** | Fiery-tempered elder and top-five master of the Zhongnan Sect. |
 | 청성파 | **Qingcheng Sect** | Sect named in Baek Museong's comparison about disciplinary rules. |
-| 집법원 | **Disciplinary Hall** | Huashan body that handles violations of sect rules. |
+| 집법원 | **Disciplinary Hall** | Mount Hua Sect body that handles violations of sect rules. |
 | 대연무장 | **Grand Training Ground** | The Jin Family's largest training ground and the site of the grand banquet. |
 | 주모 | **Lady of the House** | Title used in Wipeng's remark that Jin Wikyung lacks a wife or household mistress. |
 | 일장로 | **First Elder** | Title Cheol Mubaek claims within the Mount Heng Sword Sect. |
@@ -491,7 +491,7 @@ use. First use of an unlisted name or title almost always needs a footnote.
 | 갈 모 | **Gal Mo** | Nameless wandering martial artist who challenges Chulwoo. |
 | 한 남자가 있어, 널 너무 사랑한 | **There Is a Man Who Loved You So Much** | System Quest title generated by Chulwoo's jealous challenge. |
 | 나약한 수컷 | **Weak Male** | System Title granted if Jin Taekyung refuses the Quest. |
-| 화산제일의 기재 | **Huashan’s greatest prodigy** | Reputation attributed to Baek Museong; Taekyung privately mocks the title. |
+| 화산제일의 기재 | **Mount Hua Sect’s greatest prodigy** | Reputation attributed to Baek Museong; Taekyung privately mocks the title. |
 | 연쇄고백마 | **Serial Confession Man** | Taekyung's mocking description of Chulwoo after the duel. |
 | 대종남파 | **Great Zhongnan Sect** | Expanded and formal reference to the Zhongnan Sect. |
 | 사자후 | **lion's roar** | Taekyung's term for Song Il's crowd-shattering roar. |
@@ -814,7 +814,7 @@ use. First use of an unlisted name or title almost always needs a footnote.
 | 송문고검 | **Pine-Pattern Ancient Sword** | Willow-Cloud Divine Dragon’s sword. |
 | 태청검법 | **Great Clarity Sword Technique** | Wudang sword technique used by the Willow-Cloud Divine Dragon. |
 | 태극혜검 | **Taiji Wisdom Sword** | Wudang’s supreme sword technique. |
-| 매화삼십육검 | **Thirty-Six Plum Blossom Swords** | Huashan sword technique used by Cheongpung. |
+| 매화삼십육검 | **Thirty-Six Plum Blossom Swords** | Mount Hua Sect sword technique used by Cheongpung. |
 | 타구봉법 | **Dog-Beating Staff Technique** | Beggars’ Sect staff technique. |
 | 반로환동 | **Returned to Youth** | Possible explanation for an apparently young Supreme Peak master. |
 | 초절 | **supreme mastery** | Realm beyond Peak described as accessible only to the greatest martial artists. |
@@ -1053,11 +1053,11 @@ use. First use of an unlisted name or title almost always needs a footnote.
 | 용봉표국의 위기 | **Crisis of the Yongbong Escort Bureau** | Sudden Quest accepted and completed by Taekyung. |
 | 천력부 처치 | **Defeat Heavenly Axe** | Quest objective completed when Taekyung kills Bangyeol. |
 | 흑석채 제압 | **Subdue Black Stone Stronghold** | Quest completed when the surviving bandits surrender. |
-| 화산신룡 | **Huashan Divine Dragon** | Title given to Cheongpung after the Star-Array Grand Banquet. |
+| 화산신룡 | **Mount Hua Divine Dragon** | Title given to Cheongpung after the Star-Array Grand Banquet. |
 | 서안루 | **Xi'an Tower** | Prominent pleasure house in Xi'an. |
 | 백 씨 | **Baek** | Surname form used when Baek Museong introduces himself. |
 | 종남일룡 | **Zhongnan One Dragon** | Epithet of Hyuk Sopyung. |
-| 화종지회 | **Huashan–Zhongnan gathering** | Gathering where Baek Museong and Hyuk Sopyung met ten years earlier. |
+| 화종지회 | **Mount Hua–Zhongnan gathering** | Gathering where Baek Museong and Hyuk Sopyung met ten years earlier. |
 | 종남 제일의 기재 | **Zhongnan Sect’s greatest prodigy** | Reputation attributed to Hyuk Sopyung. |
 | 일인전승 비인부전 | **one-person transmission and refusal to teach the unworthy** | Fire Gate Clan transmission principle. |
 | 육체파 | **physical school** | Taekyung’s joking self-description. |
@@ -1087,11 +1087,11 @@ use. First use of an unlisted name or title almost always needs a footnote.
 | 황보엄 | **Hwangbo Eom** | Personal name of the Taeeul Merciless Sword. |
 | 황보 | **Hwangbo** | Surname form used when addressing Hwangbo Eom. |
 | 태을신공 | **Taeeul Divine Technique** | Zhongnan cultivation technique; Hwangbo Eom had mastered eight-tenths of it at Hyuk Sopyung's age. |
-| 종화지회 | **Huashan–Zhongnan gathering** | Source spelling variant of 화종지회 for the ten-year gathering between the two sects. |
+| 종화지회 | **Mount Hua–Zhongnan gathering** | Source spelling variant of 화종지회 for the ten-year gathering between the two sects. |
 | 스피드 개건 | **Speed Beggar** | Jin Taekyung's joking label for Gung Gibang. |
 | 성수장가 | **Seongsu Jang Family** | Prestigious medical family in Shandong. |
 | 환의 | **Pill Physician** | Title of the current Family Head of the Seongsu Jang Family. |
-| 동량지재 | **pillar of Huashan** | Reputation attributed to Baek Museong. |
+| 동량지재 | **pillar of the Mount Hua Sect** | Reputation attributed to Baek Museong. |
 | 소림혈사 | **Shaolin Bloodshed** | Past incident cited by Hwangbo Eom. |
 | 방자전 | **Bangjajeon (The Servant)** | Korean film title used in Taekyung's pun on insolence. |
 | 종남제일인 | **Zhongnan's greatest master** | Taekyung's description of Hwangbo Eom. |

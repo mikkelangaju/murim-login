@@ -130,7 +130,7 @@ These should be treated as fixed proper nouns.
 | 항산검문   | **Mount Heng Sword Sect**        |
 | 하오문    | **Lower District Sect**          |
 | 열화문    | **Fire Gate Clan**               |
-| 화산파    | **Huashan**                      |
+| 화산파    | **Mount Hua Sect**               |
 | 종남파    | **Zhongnan Sect**                |
 | 소림     | **Shaolin**                      |
 | 무당파    | **Wudang**                       |
@@ -503,7 +503,7 @@ Use Chinese geographical names in their established English forms rather than Ko
 | 안휘     | **Anhui**              |
 | 중원     | **Central Plains**     |
 | 항산     | **Mount Heng**         |
-| 화산     | **Huashan**            |
+| 화산     | **Mount Hua**          |
 | 곤륜     | **Kunlun**             |
 | 무당산    | **Mount Wudang**       |
 | 구화산    | **Mount Jiuhua**       |
