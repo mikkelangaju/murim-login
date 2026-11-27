@@ -506,7 +506,7 @@ use. First use of an unlisted name or title almost always needs a footnote.
 | 철혈도 | **Iron Blood Saber** | Epithet of Peng Cheolyeong. |
 | 팽철영 | **Peng Cheolyeong** | Family Head of the Hebei Peng Family and successor to the Thunderbolt Saber King. |
 | 화천검 | **Fire Heaven Sword** | The true name of the former Unnamed Sword; beloved sword of the Fire Gate Clan's tenth Sect Leader. |
-| 볼케이노문 | **Volcano Gate Clan** | Taekyung's joking nickname and pun for the Fire Gate Clan; not a separate sect. |
+| 볼케이노문 | **Fire Gate Clan** | Taekyung’s pun on the clan’s name. |
 | 석가장 | **Seok Family Manor** | Prominent merchant family and estate described as foremost in the merchant world. |
 | 사천당문 | **Sichuan Tang Clan** | Martial clan cited for its poison-based cleansing method. |
 | 아마존 | **Amazon** | Region referenced in Taekyung's crude joke. |
