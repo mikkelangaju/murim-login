@@ -10,6 +10,7 @@
 /reader/src/assets/cover.jpg
 
 # Licensed Korean originals and generated packets that embed them.
+/orig/
 /source/
 /original 1-1104.txt
 /Murim login raw.txt
